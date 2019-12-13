@@ -1,0 +1,695 @@
+// βιβλιοθηκη για αποθηκευση στην EEPROM
+#include <EEPROM.h>
+
+// βιβλιοθηκη για οθονη LCD I2C
+#include <LiquidCrystal_I2C.h>
+#include <Wire.h>
+
+// βιβλιοθηκη για αισθητηρας θερμοκρασιας DS18B20
+#include <DallasTemperature.h>
+#include <OneWire.h>
+
+//οθονη LCD I2C
+LiquidCrystal_I2C lcd(0x27, 16, 2); //δηλωση πινακων I2C
+
+//αισθητηρας θερμοκρασιας DS18B20
+#define ONE_WIRE_BUS 11 //δηλωση pin δεδομενων στο 13
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire); //Σχετίζουμε την Onewire στον Dallas Temperature
+
+//ορισμος θερμομετρου
+float therm_1;
+float therm_2;
+
+//ορισμος τιμων θερμοκρασιων
+    float therm_T1    ;
+    float proti_D ;
+    float deuteri_D  ;
+    float triti_D  ;
+    float alarm_high ;
+    float alarm_low ;
+    float therm_T2 ;
+    float therm_T3 ;
+    float therm_T4 ;
+    float COOL ;
+    float HEAT ;
+
+    //το mode χρησιμοποιητε για τον τροπο λειτουργιας ρελε
+    float mode ;
+//το flag ειναι για να αναβοσβηνη το LED στο PIN 13
+    int flag=0 ;
+    //το menu χρησιμοποιητε για τα μπουτον του menu   
+    int menu=0 ;
+    
+bool update_Screen = true ;
+bool Moto_Run      = true ;
+bool exodos        = false ;
+
+//ορισμος εξοδων ρελε
+ const int tax_01 = A3 ;
+ const int tax_02 = A2 ;
+ const int tax_03 = A1 ;
+ const int tax_04 = A0 ;
+ const int s_xam  = 3 ;
+ const int s_yps = 4 ;
+ const int cool = 9 ;
+ const int heat = 10 ;
+ 
+//δηλωση επαφων των μπουτον menu
+const int buttonPin1 = 5; 
+const int buttonPin2 = 6; 
+const int buttonPin3 = 7; 
+const int buttonPin4 = 8; 
+
+//δηλωση επαφων των LED
+//const int ledPin0 =  11;
+const int ledPin1 =  12;     
+const int ledPin2 =  13;
+
+//τα μπουτον να ειναι σε κατασταση 0 στην εκκινηση
+int buttonState1 = 0;
+int buttonState2 = 0;
+int buttonState3 = 0;
+int buttonState4 = 0;
+    
+
+void setup() {
+
+ lcd.begin();  /* αρχικοποιηση οθονης */
+   lcd.backlight();  /* ενεργοποιηση οπισθιου φωτισμου */
+
+   sensors.begin(); /* Εκκίνηση της βιβλιοθήκης για DS18B20 */
+
+  //οροσμος pin εισοδων μπουτον 
+  pinMode(buttonPin1, INPUT_PULLUP);
+  pinMode(buttonPin2, INPUT_PULLUP);
+  pinMode(buttonPin3, INPUT_PULLUP);
+  pinMode(buttonPin4, INPUT_PULLUP);
+
+  //ορισμος pin  εξοδων LED
+  //pinMode(ledPin0, OUTPUT);
+  pinMode(ledPin1, OUTPUT);
+  pinMode(ledPin2, OUTPUT); 
+
+   /*ορισμος pin  εξοδων για ρελε */
+  pinMode(tax_01,OUTPUT);
+  pinMode(tax_02,OUTPUT);
+  pinMode(tax_03,OUTPUT);
+  pinMode(tax_04,OUTPUT);
+  pinMode(s_xam,OUTPUT);
+  pinMode(s_yps,OUTPUT);
+  pinMode(cool,OUTPUT) ;
+  pinMode(heat,OUTPUT) ;
+
+    /* οριζουμε οι εξοδοι να ειναι σε κατασταση HIGH για να ειναι
+     απενεργοποιοιμενα τα ρελε κατα την εκκινηση του κωδικα και 
+     σε καθε επανεκκινηση του arduino,ετσι δουλευουν τα πλακετακια 
+     των ρελε*/
+    digitalWrite(tax_01,HIGH);
+    digitalWrite(tax_02,HIGH);
+    digitalWrite(tax_03,HIGH);
+    digitalWrite(tax_04,HIGH);
+    digitalWrite(s_xam,HIGH);
+    digitalWrite(s_yps,HIGH);
+    digitalWrite(cool,HIGH);
+    digitalWrite(heat,HIGH);  
+
+     Serial.begin(9600);
+
+     
+        /*να παρει απο την διευθηνση μνημης 10 την τιμη 
+        therm_T1 κατα την εκκηνιση*/
+        EEPROM.get(10,therm_T1);
+   //  Serial.println( therm_T1 );
+   /*εαν η τιμη στη διευθηνση μνημης 10 ειναι μεγαλητερη του 0
+    σημενη οτι εχουν μπη τιμες στις διευθηνσης απο προηγουμενη 
+    χρηση και να παρη της τιμες απο τις τιμες για proti_D
+    ,deuteri_D,triti_D,alarm_high,alarm_low αλλιως να βαλει
+    της κατωθη τιμες */
+
+    if ( therm_T1 > 0 ) {
+       
+        EEPROM.get(10,therm_T1);
+          EEPROM.get(20,proti_D);
+          EEPROM.get(30,deuteri_D);
+          EEPROM.get(40,triti_D);
+          EEPROM.get(50,alarm_high);
+          EEPROM.get(60,alarm_low);
+          EEPROM.get(70,COOL);
+          EEPROM.get(80,HEAT);
+          EEPROM.get(90,mode);
+
+        }      
+      
+        else {
+          therm_T1  = 20.00 ;
+          proti_D  = 2.00 ;
+          deuteri_D  = 2.00 ;
+          triti_D  = 2.00 ;
+          alarm_high = 30.00 ;
+          alarm_low = 16.00 ;
+          COOL = 18.00 ;
+          HEAT = 28.00 ;
+          mode = 1.00 ;
+          
+          EEPROM.put(10,therm_T1); 
+          EEPROM.put(20,proti_D);  
+          EEPROM.put(30,deuteri_D);  
+          EEPROM.put(40,triti_D);
+          EEPROM.put(50,alarm_high);
+          EEPROM.put(60,alarm_low);
+          EEPROM.put(70,COOL);
+          EEPROM.put(80,HEAT);
+          EEPROM.put(90,mode);
+         }
+
+
+    /* εκκινηση της void  updateScreen() της κεντρικης  
+   προβολης οθονης   */ 
+ updateScreen() ; 
+ 
+}
+
+void loop() {
+
+   //να διαβαση τις εισοδους των μπουτον
+  buttonState1 = digitalRead(buttonPin1);
+  buttonState2 = digitalRead(buttonPin2);
+  buttonState3 = digitalRead(buttonPin3);
+  buttonState4 = digitalRead(buttonPin4);
+  delay(200); //μικρη χρονοκαθηστερηση
+
+  /*εαν δεν πατηθει το μπουτον 1 ενεργοποιοιτε το flag 
+   για να αναβοσβηνη το LED στο PIN 13*/
+  if (buttonState1 == LOW) { 
+    //...ones, turn led on!
+    if ( flag == 0){
+      digitalWrite(ledPin2, HIGH);
+      flag=1; //change flag variable
+    }
+    //...twice, turn led off!
+    else if ( flag == 1){
+      digitalWrite(ledPin2, LOW);
+      flag=0; //change flag variable again 
+    }    
+  }
+
+if (buttonState1 == HIGH) {
+    update_Screen = false ;
+    Moto_Run = false ;
+    exodos = false ;
+    digitalWrite(ledPin1, HIGH);
+    menu++ ;
+     if ( menu > 10 ) {
+      menu = 1 ;
+   }
+    menu_list(menu) ; //η menu_list να περνη την τιμη του menu
+  }
+  
+  if (buttonState2 == HIGH) {
+
+  }
+  
+  if (buttonState3 == HIGH) {
+
+  } 
+  
+  if (buttonState4 == HIGH ) {
+      if ( menu < 10 ) {
+        // lcd.clear();
+         lcd.setCursor(0,1);
+         lcd.print("PATHSE + H - GIA ALLAGH");
+         delay(200); //Small delay
+      }
+
+       // Serial.println( " patithike 4 " );
+  Setup_therm(menu) ; //η Setup_therm να περνη την τιμη του menu
+  }
+
+    if ( update_Screen == true) {  
+     updateScreen() ; 
+  }     
+   
+   // ENERGOLOIHSH MOTER 
+     if(Moto_Run == true){ 
+        motoboot();
+      }
+
+}
+
+//----------------------------------------------------------
+
+void Setup_therm( int  ePr) {
+     float eprom_Therm ;
+     bool Setup_flag = false;
+     if ( ePr == 10  ){
+       update_Screen = true ;    
+       Setup_flag = true;
+       Moto_Run =  true ;
+       digitalWrite(ledPin1, LOW);
+       return ;
+     }
+
+     
+   EEPROM.get( (ePr*10) ,eprom_Therm);
+  // Serial.println( eprom_Therm );   
+  while(!Setup_flag){
+        //Read button state (pressed or not pressed?)
+        buttonState1 = digitalRead(buttonPin1);
+        buttonState2 = digitalRead(buttonPin2);
+        buttonState3 = digitalRead(buttonPin3);
+        buttonState4 = digitalRead(buttonPin4);
+     //   Serial.print ( "buttonState2 " ) ;
+     //   Serial.println( buttonState2 ) ;  
+    if ( buttonState2 == HIGH   )
+          {
+         eprom_Therm = eprom_Therm + 1 ;
+         //  Serial.println( eprom_Therm );
+         //  lcd.clear();
+        // check_therm();
+           lcd.setCursor(0,1);
+           lcd.print("NEA TIMH..");
+           lcd.setCursor(11,1);
+           lcd.print(eprom_Therm);
+           
+           digitalWrite(ledPin1, HIGH);
+           delay(500) ;      
+     }
+    
+    if ( buttonState3 == HIGH   )
+          {
+         eprom_Therm = eprom_Therm - 1 ;
+         //  Serial.println( eprom_Therm );
+         //  lcd.clear();
+        // check_therm();
+           lcd.setCursor(0,1);
+           lcd.print("NEA TIMH..");
+           lcd.setCursor(11,1);
+           lcd.print(eprom_Therm);
+           delay(500) ;      
+     }
+      
+    if ( buttonState4 == HIGH   )
+          {
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("***** OK ********");
+       
+          EEPROM.put( (ePr*10) ,eprom_Therm);
+  
+         // Serial.println( "eprom_Therm "  ) ;
+         // Serial.println(  ePr*10 ) ;
+         // Serial.println( eprom_Therm  ) ;
+          
+          delay(2000);
+
+          
+      
+          EEPROM.get(10,therm_T1);
+          EEPROM.get(20,proti_D);
+          EEPROM.get(30,deuteri_D);
+          EEPROM.get(40,triti_D);
+          EEPROM.get(50,alarm_high);
+          EEPROM.get(60,alarm_low);
+          EEPROM.get(70,COOL);
+          EEPROM.get(80,HEAT);
+          EEPROM.get(90,mode);
+       
+          update_Screen = true ;    
+          Setup_flag = true;
+          Moto_Run =  true ;
+          digitalWrite(ledPin1, LOW);
+         
+          break;
+      }
+   
+  }
+  /*ειναι void που ελεγχει τη διαφορα αναμεσα στης θερμοκρασιες
+   των ταχητητων*/ 
+ check_therm();
+}
+
+//----------------------------------------------------------
+
+void menu_list( int mm  ) {
+  
+ //Serial.print( " epilegmeno menu "  ) ;
+ //Serial.println(  mm  ) ;
+
+  switch ( mm) {  
+  case 1 : 
+     lcd.clear();
+     lcd.setCursor(0,0);
+     lcd.print("1.T1 THERM"  );
+     lcd.setCursor(11,0);
+     lcd.print(String(therm_T1) );
+    break;    
+  case  2 : 
+   lcd.clear();
+     lcd.setCursor(0,0);
+     lcd.print("2.T2 THERM"   );
+     lcd.setCursor(11,0);
+     lcd.print(String(therm_T2) );
+     lcd.setCursor(0,1);
+     lcd.print("T1<T2...");
+     lcd.setCursor(9,1);
+     lcd.print(proti_D);
+   break;
+  case  3 : 
+   lcd.clear();
+     lcd.setCursor(0,0);
+     lcd.print("3.T3 THERM"  );
+     lcd.setCursor(11,0);
+     lcd.print(String(therm_T3) );     
+     lcd.setCursor(0,1);
+     lcd.print("T2<T3...");
+     lcd.setCursor(9,1);
+     lcd.print(deuteri_D);
+   break;
+  case  4 : 
+     lcd.clear();
+     lcd.setCursor(0,0);
+     lcd.print("4.T4 THERM"  );
+     lcd.setCursor(11,0);
+     lcd.print(String(therm_T4) );
+     lcd.setCursor(0,1);
+     lcd.print("T3<T4...");
+     lcd.setCursor(9,1);
+     lcd.print(triti_D);     
+   break;
+  case  5 : 
+     lcd.clear();
+     lcd.setCursor(0,0);
+     lcd.print("5.HIGH THERM"   );
+     lcd.setCursor(11,0);
+     lcd.print(String(alarm_high) );
+   break;
+  case  6 : 
+     lcd.clear();
+     lcd.setCursor(0,0);
+     lcd.print("6.LOW THERM"  );
+     lcd.setCursor(11,0);
+     lcd.print(String(alarm_low) );     
+   break;
+   case  7:
+     lcd.clear();
+     lcd.setCursor(0,0);
+     lcd.print("7.COOL");
+     lcd.setCursor(11,0);
+     lcd.print(String(COOL));
+   break;
+   case  8:
+     lcd.clear();
+     lcd.setCursor(0,0);
+     lcd.print("8.HEAT");
+     lcd.setCursor(11,0);
+     lcd.print(String(HEAT));
+   break;
+   case  9:
+     lcd.clear();
+     lcd.setCursor(0,0);
+     lcd.print("9.MODE");
+     lcd.setCursor(11,0);
+     lcd.print(String(mode));
+   break;
+   case  10 : 
+     lcd.clear();
+     lcd.setCursor(2,0);
+     lcd.print("10.  exit  ");
+   break;
+     
+    default: ;
+  } 
+}
+
+/*---------------------------------------------------------*/
+
+void updateScreen() {
+
+  //   return ;
+     
+     sensors.requestTemperatures ();
+     therm_1=(sensors.getTempCByIndex(0));  
+     therm_2=(sensors.getTempCByIndex(1)); 
+
+ /* Serial.print (therm_1);
+  Serial.println (therm_2); 
+ */
+  ///  lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("THERM...");
+    lcd.setCursor(8,0);
+    lcd.print(therm_1);
+    lcd.setCursor(13,0);
+    lcd.print("...");
+    lcd.setCursor(0,1);
+    lcd.print("T1=");
+    lcd.setCursor(3,1);
+    lcd.print(therm_T1);
+    lcd.setCursor(8,1);
+    lcd.print("  MODE.");
+    lcd.setCursor(15,1);
+    lcd.print(mode);   /* θερμοκρασία EEPROM 10    */
+}
+
+/*----------------------------------------------------*/
+
+void motoboot() {
+
+ // Serial.println( therm_1  ) ;
+ // Serial.println( therm  ) ;
+
+  therm_T2 = (therm_T1 + proti_D);
+  therm_T3 = (therm_T2 + deuteri_D);
+  therm_T4 = (therm_T3 + triti_D);
+
+ if (EEPROM.get(90,mode)==1.00){
+    //0 taxytita
+    if (therm_1 < therm_T1)
+       {
+         digitalWrite(tax_01,HIGH);
+         digitalWrite(tax_02,HIGH);
+         digitalWrite(tax_03,HIGH);
+         digitalWrite(tax_04,HIGH);
+    }
+
+    
+    // 1 taxytita
+    if (therm_1 >= therm_T1 and therm_1 < therm_T2 )
+       {
+         digitalWrite(tax_02,HIGH);
+         digitalWrite(tax_03,HIGH);
+         digitalWrite(tax_04,HIGH);
+         delay(2000);
+         digitalWrite(tax_01,LOW);
+    }
+        
+
+    // 2 taxytita
+    if (therm_1>=therm_T2 and therm_1<therm_T3 )
+       {
+         digitalWrite(tax_01,HIGH);
+         digitalWrite(tax_03,HIGH);
+         digitalWrite(tax_04,HIGH);
+         delay(2000);
+         digitalWrite(tax_02,LOW);
+    }
+        
+
+    // 3 taxytita
+    if (therm_1>=therm_T3 and therm_1<therm_T4 )
+       {
+         digitalWrite(tax_01,HIGH);
+         digitalWrite(tax_02,HIGH);
+         digitalWrite(tax_04,HIGH);
+         delay(2000);
+         digitalWrite(tax_03,LOW);
+       }
+    // 4 taxytita
+    if (therm_1>=therm_T4 )
+       {
+         digitalWrite(tax_01,HIGH);
+         digitalWrite(tax_02,HIGH);
+         digitalWrite(tax_03,HIGH);
+         delay(2000);
+         digitalWrite(tax_04,LOW);
+    }
+
+  
+      // kindinos xamili thermokrasia
+      
+     // kindinos xamili thermokrasia
+      
+    if (therm_1<=alarm_low)
+      {  digitalWrite(s_xam,HIGH);
+    }
+    else 
+        {  digitalWrite(s_xam,LOW);
+    }
+
+      // kindinos ypsili thermokrasia
+      
+    if (therm_1>=alarm_high)
+      {  digitalWrite(s_yps,HIGH);
+    }
+    else
+        {digitalWrite(s_yps,LOW);
+    }
+
+    //οταν πεφτει η θερμοκρασια ενεργοποιω τη ζεστη
+    if (therm_1<= HEAT)
+      {  digitalWrite(s_xam,HIGH);
+    }
+    else 
+        {  digitalWrite(s_xam,LOW);
+    }
+
+    //οταν ανεβαινη η θερμοκρασια ενεργοποιω το κρυο
+     if (therm_1>= COOL)
+      {  digitalWrite(s_xam,HIGH);
+    }
+    else 
+        {  digitalWrite(s_xam,LOW);
+    }
+}
+
+  if (EEPROM.get(90,mode)==2.00){
+      //0 taxytita
+    if (therm_1 < therm_T1)
+       {
+         digitalWrite(tax_01,HIGH);
+         digitalWrite(tax_02,HIGH);
+         digitalWrite(tax_03,HIGH);
+         digitalWrite(tax_04,HIGH);
+    }
+
+    
+    // 1 taxytita
+    if (therm_1 >= therm_T1 and therm_1 < therm_T2 )
+       {
+         digitalWrite(tax_02,HIGH);
+         digitalWrite(tax_03,HIGH);
+         digitalWrite(tax_04,HIGH);
+         delay(2000);
+         digitalWrite(tax_01,LOW);
+    }
+        
+
+    // 2 taxytita
+    if (therm_1>=therm_T2 and therm_1<therm_T3 )
+       {
+         
+         digitalWrite(tax_03,HIGH);
+         digitalWrite(tax_04,HIGH);
+         delay(2000);
+         digitalWrite(tax_01,LOW);
+         digitalWrite(tax_02,LOW);
+    }
+        
+
+    // 3 taxytita
+    if (therm_1>=therm_T3 and therm_1<therm_T4 )
+       {
+         
+         digitalWrite(tax_04,HIGH);
+         delay(2000);
+         digitalWrite(tax_01,LOW);
+         digitalWrite(tax_02,LOW);
+         digitalWrite(tax_03,LOW);
+       }
+    // 4 taxytita
+    if (therm_1>=therm_T4 )
+       {
+        delay(2000);
+         digitalWrite(tax_01,LOW);
+         digitalWrite(tax_02,LOW);
+         digitalWrite(tax_03,LOW);
+         digitalWrite(tax_04,LOW);
+    }
+
+  
+      // kindinos xamili thermokrasia
+      
+     // kindinos xamili thermokrasia
+      
+    if (therm_1<=alarm_low)
+      {  digitalWrite(s_xam,HIGH);
+    }
+    else 
+        {  digitalWrite(s_xam,LOW);
+    }
+
+      // kindinos ypsili thermokrasia
+      
+    if (therm_1>=alarm_high)
+      {  digitalWrite(s_yps,HIGH);
+    }
+    else
+        {digitalWrite(s_yps,LOW);
+    }
+
+    //οταν πεφτει η θερμοκρασια ενεργοποιω τη ζεστη
+    if (therm_1<= HEAT)
+      {  digitalWrite(s_xam,HIGH);
+    }
+    else 
+        {  digitalWrite(s_xam,LOW);
+    }
+
+    //οταν ανεβαινη η θερμοκρασια ενεργοποιω το κρυο
+     if (therm_1>= COOL)
+      {  digitalWrite(s_xam,HIGH);
+    }
+    else 
+        {  digitalWrite(s_xam,LOW);
+    }
+}
+}
+
+
+//---------------------------------------------------------
+
+/*ειναι void που ελεγχει τη διαφορα αναμεσα στης θερμοκρασιες
+   των ταχητητων*/ 
+  void check_therm(){
+ 
+if (proti_D < 1.00 ){
+   proti_D = 1.00;
+   EEPROM.put(20,proti_D);
+}
+  if (proti_D > 10.00 ){
+    proti_D = 10.00;
+    EEPROM.put(20,proti_D);
+  }
+  
+if (deuteri_D < 1.00 ){
+   deuteri_D = 1.00;
+   EEPROM.put(30,deuteri_D);
+}
+
+if (deuteri_D > 10.00 ){
+   deuteri_D = 10.00;
+   EEPROM.put(30,deuteri_D);
+}
+   
+if (triti_D < 1.00){
+    triti_D = 1.00;
+    EEPROM.put(40,triti_D);
+}
+
+if (triti_D > 10.00){
+    triti_D = 10.00;
+    EEPROM.put(40,triti_D);
+}  
+
+ if (mode <= 1.00){
+     mode = 1.00;
+     EEPROM.put(90,mode);
+ }
+
+ if (mode >= 2.00){
+     mode = 2.00;
+     EEPROM.put(90,mode);
+ }
+ 
+}
