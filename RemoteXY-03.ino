@@ -231,12 +231,22 @@ void loop()
 
   RemoteXY.level_1 = therm_1 ;
   RemoteXY.level_2 = therm_2 ;
-  
+ 
   u8g.firstPage();
-  u8g.setColorIndex(1);
-  u8g.setFont(u8g_font_4x6);
-  u8g.drawStr(53,9,"code.google.com");
-  
+ do {
+  u8g.setFont(u8g_font_profont12);
+  u8g.setPrintPos(0, 10);
+  u8g.print("levitas------boiler");
+ // u8g.setFont(u8g_font_profont15r);  // u8g_font_timR14
+  u8g.setFont(u8g_font_timR14);
+  u8g.setPrintPos(0, 40);
+  u8g.print(therm_1);
+  u8g.setPrintPos(75,40);
+  u8g.print(therm_2);
+  u8g.setPrintPos(10, 60);
+  u8g.setFont(u8g_font_profont10);
+  u8g.print("www.dbsoft.gr");
+ } while (u8g.nextPage() ); 
    // TODO you loop code
   // use the RemoteXY structure for data transfer
  
