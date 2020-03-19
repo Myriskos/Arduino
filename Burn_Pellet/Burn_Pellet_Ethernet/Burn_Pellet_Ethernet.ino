@@ -20,13 +20,15 @@
 //////////////////////////////////////////////
 
 // RemoteXY select connection mode and include library 
-#define REMOTEXY_MODE__HARDSERIAL
+#define REMOTEXY_MODE__ESP8266WIFI_LIB_POINT
+#include <ESP8266WiFi.h>
 
 #include <RemoteXY.h>
 
 // RemoteXY connection settings 
-#define REMOTEXY_SERIAL Serial
-#define REMOTEXY_SERIAL_SPEED 9600
+#define REMOTEXY_WIFI_SSID "RemoteXY"
+#define REMOTEXY_WIFI_PASSWORD "12345678"
+#define REMOTEXY_SERVER_PORT 6377
 
 
 // RemoteXY configurate  
@@ -197,18 +199,19 @@ struct {
 /////////////////////////////////////////////
 //           END RemoteXY include          //
 /////////////////////////////////////////////
-
+/*
 #include <SoftwareSerial.h>
-SoftwareSerial ArduinoUno(3,2);   // TX-RX
+SoftwareSerial Serial1(3,2);   // TX-RX
+*/
 
 String str;
 #include <EEPROM.h>
 #define PIN_SWITCH_1 13
 //ορισμος εξοδων ρελε
-int  Relay_00 = A0 ;
-int  Relay_01 = A1 ;
-int  Relay_02 = A2 ;
-int  Relay_03 = A3 ;
+int  Relay_00 = D0 ;
+int  Relay_01 = D1 ;
+int  Relay_02 = D2 ;
+int  Relay_03 = D3 ;
 bool Relay_00_on = false ;
 bool Relay_01_on = false ;
 bool Relay_02_on = false ;
@@ -235,13 +238,14 @@ void setup()
 {
   RemoteXY_Init (); 
   Serial.begin(9600);
-  ArduinoUno.begin(2400);
+  //Serial1.begin(9600);
 
-//  while(!ArduinoUno.available()>0 ){
-//      Serial.println(".");
-//    delay(500);
-//  }
- 
+  
+
+  if (!RemoteXY.connect_flag){
+    Serial.print("no_connect" );
+  }
+
   
   pinMode( buttonPin,INPUT_PULLUP);  
   pinMode (PIN_SWITCH_1, OUTPUT);
@@ -380,19 +384,31 @@ void loop()
      
      dtostrf(therm_5, 0, 1, RemoteXY.text_5);
      RemoteXY.level_5 = (therm_5) ;     
-  
+ str =String('%')+String(therm_1)+String('%')+String(therm_2)+String('%')+ String(therm_3)+String('%')+ String(therm_4)+String('%')+String(therm_5)+String('%')  ;  
+ Serial.println(str);
+/*  
   //-----------------------------------------------------
-  str =String('%')+String(11.11)+String('%')+String(therm_1)+String('%')+String(therm_2)+String('%')+ String(therm_3)+String('%')+ String(therm_4)+String('%')+String(therm_5)+String('%')+String('%')+String(99.99)+String('%')  ;
- // if (ArduinoUno.available()) {
-    ArduinoUno.print(str);
- //   Serial.println(str);    
+  str =String('%')+String(therm_1)+String('%')+String(therm_2)+String('%')+ String(therm_3)+String('%')+ String(therm_4)+String('%')+String(therm_5)+String('%')  ;
+  if (Serial1.available()) {
+    Serial1.println(str);
    
     char message[] = "SEND TO ESP...." ;
     strcpy (RemoteXY.mess_01, message ) ;
     dtostrf(therm_1, 0, 1, RemoteXY.mess_02);
-//  }
-
+  //  strcpy (RemoteXY.mess_02[] ,  str  ) ;
+  }
+  else {
+   strcpy ( RemoteXY.mess_01 , "error on Serial") ;
+   dtostrf( 99.99, 0, 1, RemoteXY.mess_02);
+  }
+  Serial.println(str+" SEND TO ESP  ");
+  delay(1000);
+//---------------------------------------------------------
+*/
 }
+
+
+
 
 void open_Fire() {
   //digitalWrite(Relay_00,HIGH);
@@ -423,6 +439,7 @@ void open_Cochlea() {
     // Μαυτο τον τρόπο δεν σταματάει η ροη του προγράμματος
     // ενω με την daley()  σταματάει
     unsigned long currentMillisCochlea = millis();
+    //Serial.println( currentMillisCochlea ) ;
     int  timer = 0 ;
     if (ledStateCochlea){
        timer = RemoteXY.edit_10 ;  // ο χρονος που ριχνει pellet
@@ -448,7 +465,7 @@ void open_Cochlea() {
 
 void Close_Cochlea() {
       ledStateCochlea = LOW;
-      digitalWrite(Relay_02 ,LOW);
+  //    digitalWrite(Relay_02 ,LOW);
       RemoteXY.led_4_r = 200 ;
       RemoteXY.led_4_g = 0 ;
 }
