@@ -1,0 +1,30 @@
+#include <EEPROM.h>
+
+void setup()  {
+  Serial.begin(9600);
+}
+
+int addr, data;
+
+void loop() {
+  String buffer= "";
+  buffer= Serial.readString();
+  if (buffer.startsWith("read"))  {
+    addr= (' ');
+    Serial.print("Data: ");
+    Serial.print(addr);
+    Serial.println();
+    Serial.println(EEPROM.read(addr));
+  }
+
+  else if (buffer.startsWith("write")) {
+    addr=(' ');
+    data=(' ');
+    Serial.print("Address: ");
+    Serial.print(addr);
+    Serial.println();
+    Serial.print(data);
+    Serial.println();
+    EEPROM.write(addr, data);
+  }
+}
