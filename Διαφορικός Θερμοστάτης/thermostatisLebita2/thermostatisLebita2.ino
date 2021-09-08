@@ -95,18 +95,18 @@ struct {
  DallasTemperature sensors(&oneWire); //Σχετίζουμε την Onewire στον Dallas Temperature
 
 #include <Arduino.h>
-#include <U8x8lib.h>
-//#include <U8g2lib.h>
 
+#include <U8g2lib.h>
 #ifdef U8X8_HAVE_HW_SPI
 #include <SPI.h>
 #endif
 
-// Please UNCOMMENT one of the contructor lines below
-// U8x8 Contructor List 
-U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8(/* clock=*/ SCL, /* data=*/ SDA, /* reset=*/ U8X8_PIN_NONE);   // OLEDs without Reset of the Display
-//U8X8_SSD1306_128X32_UNIVISION_SW_I2C u8x8(/* clock=*/ SCL, /* data=*/ SDA, /* reset=*/ U8X8_PIN_NONE);   // Adafruit Feather ESP8266/32u4 Boards + FeatherWing OLED
-//το flag ειναι για να αναβοσβηνη το LED 
+#ifdef U8X8_HAVE_HW_I2C
+#include <Wire.h>
+#endif
+U8G2_SSD1306_128X32_UNIVISION_1_SW_I2C u8g2(U8G2_R0, /* clock=*/ SCL, /* data=*/ SDA, /* reset=*/ U8X8_PIN_NONE);   // Adafruit Feather ESP8266/32u4 Boards + FeatherWing OLED
+
+
 int flag=0 ;
 float therm_1 ;
 float therm_2 ;
@@ -147,9 +147,7 @@ void setup()
  pinMode( Relay_01 ,OUTPUT );  
  digitalWrite(Relay_01,HIGH); 
   
-  u8x8.begin();
-  u8x8.setPowerSave(0);
-  u8x8.clear();
+ u8g2.begin();
   
 }
 
@@ -157,33 +155,30 @@ void loop() {
   arxh:
   RemoteXY_Handler ();
   buttonState = ((RemoteXY.switch_1==0)?HIGH:LOW);
-
-   if (!buttonState) {
-      Relay_on = true ;
-      digitalWrite(Relay_01,LOW);
-      goto arxh ;
-   }
-
-   
+  
   sensors.requestTemperatures ();
   therm_1=(sensors.getTempCByIndex(0));  
   therm_2=(sensors.getTempCByIndex(1));
-
-//  u8x8.setFont(u8x8_font_chroma48medium8_r);
-//  u8x8.drawString(02,0,"www.dbSoft.gr");
-// // u8x8.drawString(01,3,"info@dbSoft.gr");
-//  u8x8.setFont(u8x8_font_px437wyse700b_2x2_r);
-//  u8x8.drawString(04,2, "25.30");
-
-  u8x8.setFont(u8x8_font_chroma48medium8_r);
-  u8x8.drawString(01,0,"www.dbSoft.gr");
-  u8x8.drawString(01,6,"info@dbSoft.gr");
-  u8x8.setFont(u8x8_font_px437wyse700b_2x2_r);
-//  u8x8.setFont(u8g2_font_unifont_t_greek);
- u8x8.drawString(02, 03, "23");
- u8x8.drawString(10, 03, "24");
+  delay(100);
+   
+u8g2.firstPage();
+do {
+    u8g2.setFont(u8g2_font_cu12_t_greek);
+  //  u8g2.setFont(u8g2_font_unifont_t_greek);
+  //  u8g2.drawRFrame(2,0,120,30,7);
+    u8g2.drawUTF8( 05,10, "Λέβητας"  );
+    u8g2.drawUTF8( 70,10, "Μπόιλερ"  );
+    u8g2.setFont(u8g2_font_10x20_t_greek);
+   char text_01[11];
+   //dtostrf(therm_1, 1, 0, text_01);
+   dtostrf(therm_1, 0, 1, text_01);
+   
+   u8g2.drawUTF8( 15,30, text_01  );
+   char text_02[11];
+   dtostrf(therm_2, 0, 1, text_02);
+   u8g2.drawUTF8( 75,30, text_02  );
+    
   
-   delay(100);
   if (therm_1 < 0 || therm_2 < 0) {
      goto arxh ;
   }
@@ -194,18 +189,13 @@ void loop() {
   RemoteXY.level_1 = therm_1 ;
   RemoteXY.level_2 = therm_2 ;
 
-  u8x8.setFont(u8x8_font_chroma48medium8_r);
-  u8x8.drawString(01,0,"www.dbSoft.gr");
-  u8x8.drawString(01,3,"info@dbSoft.gr");
-  u8x8.setFont(u8x8_font_px437wyse700b_2x2_r);
+ 
+     if (!buttonState) {
+      Relay_on = true ;
+      digitalWrite(Relay_01,LOW);
+    //  goto arxh ;
+   }
   
-   //u8x8.setFont(u8x8_font_pxplustandynewtv_r);
-   char text_01[11];
-   dtostrf(therm_1, 1, 0, text_01);
-   u8x8.drawString(01, 11, text_01);
-   char text_02[11];
-   dtostrf(therm_2, 1, 0, text_02);
-   u8x8.drawString(10, 11, text_02);
 
 /*      char oled_msg[20];
         String tString=String(therm_1);
@@ -215,28 +205,25 @@ void loop() {
         u8x8.drawString(0, 4, oled_msg); 
 */
 
-if (therm_1 > 0 && therm_2 > 0) {   
-  if (buttonState) {
-    
-   if (therm_1 >  therm_2 ) {
-     Relay_on = true ;
-     digitalWrite(Relay_01,LOW);
-   }
-   else if  (therm_1 <  therm_2 - 0.50 )  {
-       Relay_on = false ;
-       digitalWrite(Relay_01,HIGH);
-   }  
-   else {
-       //----------
-   }
-  
-  }
-}
+    if (therm_1 > 0 && therm_2 > 0) {   
+     if (buttonState) {
+       if (therm_1 >  therm_2 ) {
+         Relay_on = true ;
+         digitalWrite(Relay_01,LOW);
+       }
+       else if  (therm_1 <  therm_2 - 0.50 )  {
+           Relay_on = false ;
+           digitalWrite(Relay_01,HIGH);
+       }  
+       else {
+           //----------
+       }
+     }
+    }
+} while ( u8g2.nextPage() );
 
   delay(1000);
 }
-
-
 
 //----------------------------------------------------------
 void ledAlarm(  int pinled  ) {
