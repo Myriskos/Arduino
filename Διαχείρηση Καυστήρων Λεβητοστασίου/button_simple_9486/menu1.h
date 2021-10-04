@@ -39,20 +39,19 @@ void menu1(){
      
  if (dispMenu){
  
-      ReadSensor: 
       sensors.requestTemperatures ();
-    //  therm03=(sensors.getTempCByIndex(2)); 
- 
+      therm03=(sensors.getTempCByIndex(2)); 
+      delay(100) ;
     String Shead = "" ;
     if (Pellet_on){
      Shead =  "Pellet" ;
-    // therm0=(sensors.getTempCByIndex(0));  
-    // delay(100) ;
+     therm0=(sensors.getTempCByIndex(0));  
+     delay(100) ;
     }
     else if (Oil_on) {
      Shead =  " Oil  " ; 
-    // therm0=(sensors.getTempCByIndex(1));  
-    // delay(100) ;
+     therm0=(sensors.getTempCByIndex(1));  
+     delay(100) ;
    }
     else {
      Shead =  " No Mode " ; 
@@ -84,58 +83,53 @@ void menu1(){
        NextMenu_btn.drawButton();
        mode_btn.drawButton();
 
-   // if (therm0 < 0 ) ; goto ReadSensor ; 
-   
+    
      if (therm0 < 0 ){ 
       continue;
      }
      dispMenu = false ;
    
  }  
-       //------------------------ Εικονικες θερμοκρασίες ----
-       if (millis() - previousMillis2 >= (intervalDisp2 * timer2 )  ) {
-           previousMillis2 = millis();   
-          if (Up)   therm0 = therm0 + 0.50 ; 
-          if (Down) therm0 = therm0 - 0.50 ;
-          if ( therm0 >= 80 ){
-            Down = true ; Up   = false ; 
-          }
-          if ( therm0 <= 30 ){
-            Up   = true ; Down = false ; 
-          }
-       }  
-       //---------------------------------------------------
  
-            //sensors.requestTemperatures ();
-            //therm03=(sensors.getTempCByIndex(2));
+//       //------------------------ Εικονικες θερμοκρασίες ----
+//       if (millis() - previousMillis2 >= (intervalDisp2 * timer2 )  ) {
+//           previousMillis2 = millis();   
+//          if (Up)   therm0 = therm0 + 0.50 ; 
+//          if (Down) therm0 = therm0 - 0.50 ;
+//          if ( therm0 >= 80 ){
+//            Down = true ; Up   = false ; 
+//          }
+//          if ( therm0 <= 30 ){
+//            Up   = true ; Down = false ; 
+//          }
+//       }  
+//       //---------------------------------------------------
+ 
+            sensors.requestTemperatures ();
+            therm03=(sensors.getTempCByIndex(2));
+             delay(100) ;
               String Shead = "" ;
               if (Pellet_on){
                Shead =  "Pellet" ;
                Levitas = "L01" ;
-              // therm0=(sensors.getTempCByIndex(0));  
-              // delay(100) ;
+               therm0=(sensors.getTempCByIndex(0));  
+               delay(100) ;
               }
               else if (Oil_on) {
                Shead =  " Oil  " ;
                Levitas = "L02" ; 
-              // therm0=(sensors.getTempCByIndex(1));  
-              // delay(100) ;
+               therm0=(sensors.getTempCByIndex(1));  
+               delay(100) ;
              }
               else {
                Shead =  " No Mode " ; 
               }
          //-------------------------------------------
        
-//           strSendSereal = String('T')+String(therm0)+String('T')+String(therm03); 
-//           strSendSereal+= String('T')+String(therm1)+String('T')+String(therm2)+String('T')+String(therm3); 
-//           strSendSereal+= String( Levitas ) ;
-//           strSendSereal+= String( CL )+String( CK)+String( CB ) ;
            if (millis() - previousMillis3 >= (intervalDisp3 * timer3 )  ) {
              previousMillis3 = millis();  
-//             SerialMega.println(strSendSereal);
-//             Serial.println(strSendSereal);
 
-              // Send Data from ArduinoMega Serial3 to Esp8266 
+              // Send Data from ArduinoMega Serial to Esp8266 
               StaticJsonBuffer<1000> jsonBuffer;
               JsonObject& root = jsonBuffer.createObject();
               root["therm0"]  = String(therm0);

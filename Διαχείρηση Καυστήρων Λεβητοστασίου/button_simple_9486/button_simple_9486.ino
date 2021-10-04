@@ -9,10 +9,6 @@ U8G2_FOR_ADAFRUIT_GFX u8g2_for_adafruit_gfx;
 
 
 #include <TouchScreen.h>
-#include "Greek_Sigismundus8pt7b.h"
-#include "arial.h"
-#include "Climacons20pt7b.h"
-
 #include <EEPROM.h>
 #include <SoftwareSerial.h>
 SoftwareSerial SerialMega(16,17);   // TX-RX 5,6
@@ -48,38 +44,6 @@ SoftwareSerial SerialMega(16,17);   // TX-RX 5,6
 
 const int XP=6,XM=A2,YP=A1,YM=7; //320x480 ID=0x9486
 const int TS_LEFT=919,TS_RT=128,TS_TOP=962,TS_BOT=122;
-//-------------------------------------------------
-//TouchScreen.h GFX Calibration
-//Making all control and bus pins INPUT_PULLUP
-//Typical 30k Analog pullup with corresponding pin
-//would read low when digital is written LOW
-//e.g. reads ~25 for 300R X direction
-//e.g. reads ~30 for 500R Y direction
-//
-//Testing : (A1, D7) = 33
-//Testing : (A2, D6) = 25
-//ID = 0x9486
-//
-//cx=893 cy=944 cz=499  X, Y, Pressure
-//cx=894 cy=544 cz=583  X, Y, Pressure
-//cx=899 cy=138 cz=670  X, Y, Pressure
-//cx=528 cy=949 cz=343  X, Y, Pressure
-//cx=526 cy=139 cz=596  X, Y, Pressure
-//cx=156 cy=942 cz=219  X, Y, Pressure
-//cx=153 cy=543 cz=453  X, Y, Pressure
-//cx=152 cy=144 cz=592  X, Y, Pressure
-//
-//*** COPY-PASTE from Serial Terminal:
-//const int XP=6,XM=A2,YP=A1,YM=7; //320x480 ID=0x9486
-//const int TS_LEFT=919,TS_RT=128,TS_TOP=962,TS_BOT=122;
-//
-//PORTRAIT  CALIBRATION     320 x 480
-//x = map(p.x, LEFT=919, RT=128, 0, 320)
-//y = map(p.y, TOP=962, BOT=122, 0, 480)
-//
-//LANDSCAPE CALIBRATION     480 x 320
-//x = map(p.y, LEFT=962, RT=122, 0, 480)
-//y = map(p.x, TOP=128, BOT=919, 0, 320)
 
 
 //--------------------------------------------------
@@ -168,8 +132,6 @@ int BLUE = tft.color565(50, 50, 255);
 
 #include "menu1.h"
 #include "menu2.h"
-//#include "bitmap_mono.h"
-//#include "bitmap_RGB.h"
 
 //--------------------------------------------
 void setup(void)
@@ -183,7 +145,7 @@ void setup(void)
     Serial.println(ID, HEX);
     Serial.println("Calibrate for your Touch Panel");
 
-   // ID = 0x9325; // write-only shield
+   // ID = 0x9486 ; // write-only shield
     tft.begin(ID);
     tft.setRotation(0);            // 0= PORTRAIT  3 = LANDSCAPE
     tft.fillScreen(BLACK);
@@ -395,15 +357,8 @@ void header1( String  Msg   ) {
 //-------------------------------------------  
 
      tft.fillRect(20, 10, 250 , 40, RED);
-   ////  tft.setCursor(30,30);
-    // tft.setFont(&Greek_Sigismundus8pt7b);
-    // tft.setFont(&C__Windows_Fonts_arial12pt8b);
-    tft.setFont(&Climacons20pt7b);
-     tft.setTextSize(1);
-    tft.setCursor(250,55);
-    tft.setTextColor(CYAN);
-    tft.print( "1"  );
-    tft.setFont();
+   
+     tft.setFont();
    
     
     tft.setTextSize(5);
@@ -428,6 +383,7 @@ void header1( String  Msg   ) {
 //----------------------------------------
 void dispScreen(){
 //----------------------------------------
+
 //---------Διαχ/ση Relay Λέβητα ( Pellet ή Oil  )------ 
      tft.setCursor(180,90);
      tft.print(  therm1  );

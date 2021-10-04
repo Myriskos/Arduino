@@ -2,8 +2,7 @@
 //--------------------------------------------
 void menu2(){
 //--------------------------------------------
-//#include "bitmap_mono.h"    // 
-//#include "bitmap_RGB.h" 
+
 u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek); 
  therm1_btn.initButton(&tft,  80, 100, 150, 40, WHITE, BLACK, BLACK, "", 2);
  therm2_btn.initButton(&tft,  80, 150, 150, 40, WHITE, BLACK, BLACK, "", 2);
@@ -71,33 +70,13 @@ u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek);
         save_therm1 = false ;
 
      }
-   //----------------------εικονικη θερμοκρασία ΜπόΙλερ------------------------------------------------
+   //---------------------- θερμοκρασία ΜπόΙλερ---------------------------
       if (millis() - previousMillis2 >= (intervalDisp2 * timer2 )  ) {
         previousMillis2 = millis();   
 
-        if (Up)   therm03 = therm03 + 0.50 ; 
-          if (Down) therm03 = therm03 - 0.50 ;
-          if ( therm03 >= 80 ){
-            Down = true ; Up   = false ; 
-          }
-          if ( therm03 <= 30 ){
-            Up   = true ; Down = false ; 
-        }
-
-     
-//     
-//     u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek); 
-//     tft.fillRect(50,250, 220,40,BLACK); 
-//     u8g2_for_adafruit_gfx.setCursor(50,280);             
-//     u8g2_for_adafruit_gfx.print( "θερμ. Νερών Μπόϊλερ"); 
-//
-//     u8g2_for_adafruit_gfx.setCursor(20,100);                // start writing at this position
-//     u8g2_for_adafruit_gfx.print( "Λέβητας");  
-//     u8g2_for_adafruit_gfx.setCursor(20,150);                // start writing at this position
-//     u8g2_for_adafruit_gfx.print( "Κυκλοφοριτής");
-//     u8g2_for_adafruit_gfx.setCursor(20,201);                // start writing at this position
-//     u8g2_for_adafruit_gfx.print( "Μπόϊλερ    "); 
-        
+        sensors.requestTemperatures ();
+        therm03=(sensors.getTempCByIndex(2)); 
+        delay(100) ;       
 
        tft.setTextColor(WHITE);
        tft.fillRect(80,300,120,50,BLACK);
