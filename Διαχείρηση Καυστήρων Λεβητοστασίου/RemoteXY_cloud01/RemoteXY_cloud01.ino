@@ -145,15 +145,20 @@ String tValue;//
 
 
 String c ;
-String b ;
-String d ;
+String b ; // Νερά Λέβητα
+String d ; // Νερά Μπόϊλερ
+String e ; // επιστρεφόμενα
 
 String therm1 ;
 String therm2 ;
 String therm3 ;
+String therm4 ;
 String Levitas ;
+
 float therm_1 ;
 float therm_2 ;
+float therm_3 ;
+float therm_4 ;
 String CL , CK , CB ;
 
 
@@ -236,11 +241,12 @@ void readJsonMega(){
   if (root == JsonObject::invalid())
     return;
 
- String b = root["therm0"] ; 
- String d = root["therm03"] ; 
- String therm1=root["therm1"] ;   
- String therm2=root["therm2"] ;   
- String therm3=root["therm3"] ;
+ String b = root["therm0"]    ; // Νερά Λέβητα    
+ String d = root["therm03"]   ; // Νερά Μπόϊλερ
+ String e = root["therm04"]   ; // Επισρεφόμενα 
+ String therm1=root["therm1"] ; // Θερμοκρασία off Relay από Αισθητήρα Λέβητα   
+ String therm2=root["therm2"] ; // Θερμοκρασία on  Relay από Αισθητήρα Κυκλοφοριτή  
+ String therm3=root["therm3"] ; // Θερμοκρασία on  Relay από Αισθητήρα Μπόϊλερ
  String Levitas=root["Levitas"];
  String CL = root["CL"] ;  
  String CK = root["CK"] ;
@@ -263,11 +269,12 @@ void loop() {
   JsonObject& root = jsonBuffer.parseObject(ArduinoMega);
   if (root == JsonObject::invalid())
     return;
- String b = root["therm0"] ; 
- String d = root["therm03"] ; 
- String therm1=root["therm1"] ;   
- String therm2=root["therm2"] ;   
- String therm3=root["therm3"] ;
+ String b = root["therm0"] ;    // Νερά Λέβητα
+ String d = root["therm03"] ;   // Νερά Μπόϊλερ
+ String e = root["therm04"] ;   // Επισρεφόμενα
+ String therm1=root["therm1"] ; // Θερμοκρασία off Relay από Αισθητήρα Λέβητα   
+ String therm2=root["therm2"] ; // Θερμοκρασία on  Relay από Αισθητήρα Κυκλοφοριτή    
+ String therm3=root["therm3"] ; // Θερμοκρασία on  Relay από Αισθητήρα Μπόϊλερ
  String Levitas=root["Levitas"];
  String CL = root["CL"] ;  
  String CK = root["CK"] ;
@@ -275,8 +282,10 @@ void loop() {
  root.prettyPrintTo(Serial);
  //--------------------------------  
 
-   therm_1 = b.toFloat();
-   therm_2 = d.toFloat();
+   therm_1 = b.toFloat();  // Νερά Λέβητα 
+   therm_2 = d.toFloat();  // Νερά Μπόϊλερ
+   therm_4 = e.toFloat();  // Επισρεφόμενα 
+   
   // Page1   
    if ( Levitas == "L01" ){
     // RemoteXY.text_0 = "Pellet" ;
@@ -286,25 +295,34 @@ void loop() {
      //RemoteXY.text_0 = "Oil" ;
      strcpy (RemoteXY.text_0 , "Oil" ) ;
    }
+   // Νερά Λέβητα
    dtostrf(therm_1, 0, 2, RemoteXY.text_0_1);
    RemoteXY.level_0_1 = therm_1 ;
-
+   // Νερά Μπόϊλερ
    dtostrf(therm_2, 0, 2, RemoteXY.text_0_2);
    RemoteXY.level_0_2 = therm_2 ;
 
   // Page2
+   // Θερμοκρασία off Relay από Αισθητήρα Λέβητα 
    dtostrf(therm1.toFloat(), 0, 2, RemoteXY.text_1);
    RemoteXY.level_1 = therm1.toFloat() ; 
+   // Θερμοκρασία on  Relay από Αισθητήρα Κυκλοφοριτή
    dtostrf(therm2.toFloat(), 0, 2, RemoteXY.text_2);
    RemoteXY.level_2 = therm2.toFloat() ; 
-////////   strcpy (RemoteXY.text_3 , therm3 ) ;
-   
+   // Θερμοκρασία on  Relay από Αισθητήρα Μπόϊλερ
    dtostrf( therm3.toFloat()   , 0, 2, RemoteXY.text_3);
    RemoteXY.level_3 = therm3.toFloat() ; 
+
+   // Επισρεφόμενα
+   dtostrf( therm_4   , 0, 2, RemoteXY.text_4);
+   RemoteXY.level_4 = therm_4 ; 
+
+    
   
 //  RemoteXY.led_1_r = xromaGreen( CL  ) ;
 //  RemoteXY.led_1_g = xromaRed(  CL   ) ; 
-//  
+
+//  Λέβητα
   if (CL == "L01") {
    RemoteXY.led_1_r =  0   ;
    RemoteXY.led_1_g =  200     ;
@@ -315,6 +333,7 @@ void loop() {
    RemoteXY.led_1_b =  0    ;
    RemoteXY.led_1_g =  0  ; 
   }
+  // Κυκλοφοριτή
    if (CK == "K01") {
    RemoteXY.led_2_r =  0   ;
    RemoteXY.led_2_g =  200     ;
@@ -325,6 +344,7 @@ void loop() {
    RemoteXY.led_2_b =  0    ;
    RemoteXY.led_2_g =  0  ; 
   }
+  //  Μπόϊλερ
    if (CB == "B01") {
    RemoteXY.led_3_r =  0   ;
    RemoteXY.led_3_g =  200     ;
