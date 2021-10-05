@@ -1,20 +1,20 @@
 //--------------------------------------------
 void menu1(){
 //--------------------------------------------
-//#include "bitmap_mono.h"
- therm1_btn.initButton(&tft,  80, 100, 150, 40, WHITE, RED, BLACK, "", 2);
- therm2_btn.initButton(&tft,  80, 150, 150, 40, WHITE, RED, BLACK, "", 2);
- therm3_btn.initButton(&tft,  80, 200, 150, 40, WHITE, RED, BLACK, "", 2);
- therm1_btn.drawButton(false);
- therm2_btn.drawButton(false);
- therm3_btn.drawButton(false);
-
- PreviewMenu_btn.initButton(&tft,  40, 400, 50, 40, WHITE, CYAN, BLACK, "<", 3);
- NextMenu_btn.initButton(&tft,    120, 400, 50, 40, WHITE, CYAN, BLACK, ">", 3);
- mode_btn.initButton(&tft,    280, 400, 50, 40, WHITE, RED, BLACK, "Mode", 2);
- PreviewMenu_btn.drawButton(false);
- NextMenu_btn.drawButton(false);
- mode_btn.drawButton(false);
+    //#include "bitmap_mono.h"
+     therm1_btn.initButton(&tft,  80, 100, 150, 40, WHITE, RED, BLACK, "", 2);
+     therm2_btn.initButton(&tft,  80, 150, 150, 40, WHITE, RED, BLACK, "", 2);
+     therm3_btn.initButton(&tft,  80, 200, 150, 40, WHITE, RED, BLACK, "", 2);
+     therm1_btn.drawButton(false);
+     therm2_btn.drawButton(false);
+     therm3_btn.drawButton(false);
+    
+     PreviewMenu_btn.initButton(&tft,  40, 400, 50, 40, WHITE, CYAN, BLACK, "<", 3);
+     NextMenu_btn.initButton(&tft,    120, 400, 50, 40, WHITE, CYAN, BLACK, ">", 3);
+     mode_btn.initButton(&tft,    280, 400, 50, 40, WHITE, RED, BLACK, "Mode", 2);
+     PreviewMenu_btn.drawButton(false);
+     NextMenu_btn.drawButton(false);
+     mode_btn.drawButton(false);
  
      u8g2_for_adafruit_gfx.setFontMode(1); 
      u8g2_for_adafruit_gfx.setForegroundColor(WHITE);
@@ -24,10 +24,10 @@ void menu1(){
      u8g2_for_adafruit_gfx.setCursor(50,280);                
      u8g2_for_adafruit_gfx.print( "θερμ. Νερών Λέβητα");
       
-//tft.drawBitmap(220, 0, tractor_128x64, 128, 64, GREEN);
+     //tft.drawBitmap(220, 0, tractor_128x64, 128, 64, GREEN);
 
- bool While_menu = true ;
- dispMenu = true ;
+    bool While_menu = true ;
+    dispMenu = true ;
  while (While_menu) {
      bool menudown = Touch_getXY();
      therm1_btn.press(menudown && therm1_btn.contains(pixel_x, pixel_y));
@@ -37,27 +37,11 @@ void menu1(){
      NextMenu_btn.press(menudown && NextMenu_btn.contains(pixel_x, pixel_y));
      mode_btn.press(menudown && mode_btn.contains(pixel_x, pixel_y));
      
- if (dispMenu){
+  if (dispMenu){
+
+       ReadSensor() ;
  
-      sensors.requestTemperatures ();
-      therm03=(sensors.getTempCByIndex(2)); 
-      delay(100) ;
-    String Shead = "" ;
-    if (Pellet_on){
-     Shead =  "Pellet" ;
-     therm0=(sensors.getTempCByIndex(0));  
-     delay(100) ;
-    }
-    else if (Oil_on) {
-     Shead =  " Oil  " ; 
-     therm0=(sensors.getTempCByIndex(1));  
-     delay(100) ;
-   }
-    else {
-     Shead =  " No Mode " ; 
-    }
-  
-     header1( "Επιλογή->"+ Shead );
+       header1( "Επιλογή->"+ Shead );
   
        therm1_btn.drawButton();   
        therm2_btn.drawButton();   
@@ -89,7 +73,7 @@ void menu1(){
      }
      dispMenu = false ;
    
- }  
+  }  
  
 //       //------------------------ Εικονικες θερμοκρασίες ----
 //       if (millis() - previousMillis2 >= (intervalDisp2 * timer2 )  ) {
@@ -103,55 +87,35 @@ void menu1(){
 //            Up   = true ; Down = false ; 
 //          }
 //       }  
-//       //---------------------------------------------------
- 
-            sensors.requestTemperatures ();
-            therm03=(sensors.getTempCByIndex(2));
-             delay(100) ;
-              String Shead = "" ;
-              if (Pellet_on){
-               Shead =  "Pellet" ;
-               Levitas = "L01" ;
-               therm0=(sensors.getTempCByIndex(0));  
-               delay(100) ;
-              }
-              else if (Oil_on) {
-               Shead =  " Oil  " ;
-               Levitas = "L02" ; 
-               therm0=(sensors.getTempCByIndex(1));  
-               delay(100) ;
-             }
-              else {
-               Shead =  " No Mode " ; 
-              }
-         //-------------------------------------------
-       
+
+  
+           ReadSensor() ;
+    
            if (millis() - previousMillis3 >= (intervalDisp3 * timer3 )  ) {
              previousMillis3 = millis();  
 
               // Send Data from ArduinoMega Serial to Esp8266 
               StaticJsonBuffer<1000> jsonBuffer;
               JsonObject& root = jsonBuffer.createObject();
-              root["therm0"]  = String(therm0);
-              root["therm03"] = String(therm03);
-              root["therm1"]  = String(therm1);
-              root["therm2"]  = String(therm2);
-              root["therm3"]  = String(therm3);
+              root["therm0"]  = String(therm0) ; // Νερά Λέβητα   
+              root["therm03"] = String(therm03); // Νερά Μπόϊλερ
+              root["therm04"] = String(therm04); // Επισρεφόμενα 
+              root["therm1"]  = String(therm1) ; // Θερμοκρασία off Relay από Αισθητήρα Λέβητα 
+              root["therm2"]  = String(therm2) ; // Θερμοκρασία on  Relay από Αισθητήρα Κυκλοφοριτή
+              root["therm3"]  = String(therm3) ; // Θερμοκρασία on  Relay από Αισθητήρα Μπόϊλερ
+              
               root["Levitas"] = String( Levitas );
               root["CL"] = String(CL);
               root["CK"] = String(CK);
               root["CB"] = String(CB);
               root.printTo(SerialMega);
               root.prettyPrintTo(Serial);
-             
            }
           
            if (millis() - previousMillis >= (intervalDisp * timer )  ) {
              previousMillis = millis();  
              dispScreen() ; 
            }
-  
-         //---------------------------------------------
   
     if (therm1_btn.justPressed()) {
         therm1_btn.drawButton(true);

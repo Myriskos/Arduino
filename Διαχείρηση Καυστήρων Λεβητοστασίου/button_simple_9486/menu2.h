@@ -3,7 +3,7 @@
 void menu2(){
 //--------------------------------------------
 
-u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek); 
+ u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek); 
  therm1_btn.initButton(&tft,  80, 100, 150, 40, WHITE, BLACK, BLACK, "", 2);
  therm2_btn.initButton(&tft,  80, 150, 150, 40, WHITE, BLACK, BLACK, "", 2);
  therm3_btn.initButton(&tft,  80, 200, 150, 40, WHITE, BLACK, BLACK, "", 2);
@@ -47,8 +47,6 @@ u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek);
      u8g2_for_adafruit_gfx.print( "Κυκλοφοριτής");
      u8g2_for_adafruit_gfx.setCursor(20,201);                // start writing at this position
      u8g2_for_adafruit_gfx.print( "Μπόϊλερ    "); 
-
-     
 
     }  
        
