@@ -142,6 +142,8 @@ void MailYahoo(){
 // A4:CF:12:DF:48:AA    RECEIVER
 
 uint8_t broadcastAddress[] = {0xA4, 0xCF, 0x12, 0xDF, 0x48, 0xAA}; // RECEIVER
+uint8_t newMACAddress[] = {0xA4, 0xCF, 0x12, 0xDF, 0x58, 0x46};
+
 
  const int buzzerPin = D2;
  const int buttonPin = D1; // 16
@@ -171,7 +173,10 @@ void setup() {
   pinMode(buzzerPin, OUTPUT); 
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
+  // Allagh macAdrees sto esp8266
+  wifi_set_macaddr(STATION_IF, &newMACAddress[0]);
 
+  
 //------------Start autoConnect-------------- 
     //--- settaggi di Wifimanager-------
     WiFiManager wifiManager;
