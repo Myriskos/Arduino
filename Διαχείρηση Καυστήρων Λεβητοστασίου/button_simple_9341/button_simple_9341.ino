@@ -553,7 +553,7 @@ void dispScreen(){
         CL = "L02" ;
       }
      }  
-     else if ( therm0 <= therm1-2 ) {  
+     else if ( therm0 <= therm1-0.50 ) {  
        if (Pellet_on) {
         tft.fillRect(210,90, 20,20, GREEN) ; 
         digitalWrite(Relay_01,LOW);
@@ -574,7 +574,7 @@ void dispScreen(){
         digitalWrite(Relay_03,LOW);
         CK = "K01" ;
      }  
-     else if ( therm0 <= therm2-2 ) {  
+     else if ( therm0 <= therm2-0.50 ) {  
         tft.fillRect(210,140, 20,20, RED) ; 
         digitalWrite(Relay_03,HIGH);
         CK = "K02" ;
@@ -588,7 +588,7 @@ void dispScreen(){
         digitalWrite(Relay_04,LOW);
         CB = "B01" ;
      }  
-     else if  ( therm0 <= therm03-2 ) {   
+     else if  ( therm0 <= therm03-0.50 ) {   
         tft.fillRect(210,190, 20,20, RED)  ; 
         digitalWrite(Relay_04,HIGH);
         CB = "B02" ;
