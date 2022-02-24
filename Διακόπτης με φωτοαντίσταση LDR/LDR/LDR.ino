@@ -100,7 +100,7 @@ void setup() {
      //     wifiManager.resetSettings();
     wifiManager.setTimeout(180); 
  
-    if (!wifiManager.autoConnect("WiFi-ESP_A", "12345678")) // credenziali per accedere alla modalità AP
+    if (!wifiManager.autoConnect("WiFi-ESP_LDR", "12345678")) // credenziali per accedere alla modalità AP
     {
       delay(3000);
       ESP.reset();
@@ -120,7 +120,7 @@ void setup() {
      EEPROM.get( 100,EEPROM_timiFotos);
     } 
     else { 
-     EEPROM_timiFotos = 400 ; 
+     EEPROM_timiFotos = 200 ; 
      EEPROM.begin(512);
      EEPROM.put( 100,EEPROM_timiFotos);
      EEPROM.commit();
@@ -136,7 +136,7 @@ RemoteXY_Handler ();
 
  if (RemoteXY.switch_1 == 1){
    digitalWrite(RelayPin,HIGH);
-   Serial.println(" light ");
+   Serial.println(" light manual ");
    delay(1000); 
  }
  else {
@@ -154,15 +154,17 @@ RemoteXY_Handler ();
     timiFotos = analogRead(pinAisthitira); 
     delay(500);
     Serial.println(timiFotos); 
-   // Serial.println(RemoteXY.edit_1);
-    if (timiFotos <  RemoteXY.edit_1 - 50 )
-    {
-     digitalWrite(RelayPin, LOW);
-    }
-    if (timiFotos > RemoteXY.edit_1  )
-    {
+ 
+ 
+	if (timiFotos >= RemoteXY.edit_1  ){ 
      digitalWrite(RelayPin,HIGH);
-     Serial.println(" light ");
     }
+	else if (timiFotos <=  RemoteXY.edit_1 - 50 ) {
+	 digitalWrite(RelayPin, LOW); 
+	}
+	else {
+	 Serial.println(" white.... ");
+	}
+	
  } 
 }
