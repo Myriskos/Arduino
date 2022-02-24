@@ -3,11 +3,19 @@
 #include <Adafruit_GFX.h>
 #include <MCUFRIEND_kbv.h>
 MCUFRIEND_kbv tft;
+
+#include "U8g2_for_Adafruit_GFX.h"
+U8G2_FOR_ADAFRUIT_GFX u8g2_for_adafruit_gfx;
+
+
 #include <TouchScreen.h>
-#include "Greek_Sigismundus8pt7b.h"
 #include <EEPROM.h>
 #include <SoftwareSerial.h>
-SoftwareSerial SerialMega(16,17);   // TX-RX 5,6
+//SoftwareSerial SerialMega(16,17);   // TX-RX 5,6
+//SoftwareSerial SerialMega(14,15);   // TX-RX 5,6
+
+
+#include <ArduinoJson.h>   // Ver 5.xx
 
 /*
   MEGA        ESP8266 NODE MCU
@@ -23,9 +31,19 @@ SoftwareSerial SerialMega(16,17);   // TX-RX 5,6
 #include <DallasTemperature.h>
 #include <OneWire.h>
 //αισθητηρας θερμοκρασιας DS18B20
- #define ONE_WIRE_BUS  40   //D3 //δηλωση pin 
- OneWire oneWire(ONE_WIRE_BUS);
- DallasTemperature sensors(&oneWire); //Σχετίζουμε την Onewire στον Dallas Temperature
+  #define ONE_WIRE_BUS1 39   //δηλωση pin αισθητηρα Πετρελαίου
+ OneWire oneWire1(ONE_WIRE_BUS1);
+ DallasTemperature sensors1(&oneWire1); //Σχετίζουμε την Onewire στον Dallas Temperature
+ #define ONE_WIRE_BUS2  41   //δηλωση pin αισθητηρα Πέλλετ
+ OneWire oneWire2(ONE_WIRE_BUS2);
+ DallasTemperature sensors2(&oneWire2); //Σχετίζουμε την Onewire στον Dallas Temperature
+ #define ONE_WIRE_BUS3  43   //δηλωση pin αισθητηρα Μπόϊλερ
+ OneWire oneWire3(ONE_WIRE_BUS3);
+ DallasTemperature sensors3(&oneWire3); //Σχετίζουμε την Onewire στον Dallas Temperature
+  #define ONE_WIRE_BUS4 45   //δηλωση pin αισθητηρα Επισρεφόμενα Νερά
+ OneWire oneWire4(ONE_WIRE_BUS4);
+ DallasTemperature sensors4(&oneWire4); //Σχετίζουμε την Onewire στον Dallas Temperature 
+
 
 
 #define MINPRESSURE 200
@@ -52,6 +70,8 @@ float therm0 = 22.50 ;
 float therm1 = 75.50 ; 
 float therm2 = 40.50 ; 
 float therm3 = 55.50 ;
+//float therm03 = 48.50 ;
+float therm03 = 40.00 ;
 int MenuCount = 1 ;
 
 
@@ -86,6 +106,9 @@ bool Relay_04_on = false ;
  const    long intervalDisp2 = 100;
  int  timer2 = 10 ;
 
+ unsigned long previousMillis3 = 0; 
+ const    long intervalDisp3 = 100;
+ int  timer3 = 15 ;
 //----------------------------------
  
 TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
@@ -135,13 +158,19 @@ int BLUE = tft.color565(50, 50, 255);
 #include "menu1.h"
 #include "menu2.h"
 
+
+
 //--------------------------------------------
 void setup(void)
 //--------------------------------------------
 {
   
-    SerialMega.begin(115200);
-    Serial.begin(9600);
+   Serial.begin(9600);
+   Serial2.begin(9600);
+   Serial3.begin(9600);
+   
+   
+    
     uint16_t ID = tft.readID();
     Serial.print("TFT ID = 0x");
     Serial.println(ID, HEX);
@@ -151,7 +180,7 @@ void setup(void)
     tft.begin(ID);
     tft.setRotation(0);            // 0= PORTRAIT  3 = LANDSCAPE
     tft.fillScreen(BLACK);
-
+u8g2_for_adafruit_gfx.begin(tft); 
     pinMode(Relay_01,OUTPUT);
     pinMode(Relay_02,OUTPUT);
     pinMode(Relay_03,OUTPUT); 
@@ -190,7 +219,15 @@ bootSreen() ;
 //--------------------------------------------
 void loop(void){
 //--------------------------------------------
-   
+
+   u8g2_for_adafruit_gfx.setFontMode(1);                 // use u8g2 none transparent mode
+  u8g2_for_adafruit_gfx.setFontDirection(0);            // left to right (this is default)
+  u8g2_for_adafruit_gfx.setForegroundColor(WHITE);      // apply Adafruit GFX color
+  
+ // u8g2_for_adafruit_gfx.setFont(u8g2_font_cu12_t_greek);  // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
+  u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek); 
+ // u8g2_for_adafruit_gfx.setFont(u8g2_font_unifont_t_greek);
+ 
   switch(MenuCount){
    case 1:
       menu1();
@@ -208,7 +245,7 @@ float therm_setup( String HeadMsg , float therm ){
     bool save_therm = true ;
     tft.fillScreen(BLACK);
 
-    on_btn.initButton(&tft,  60, 200, 100, 40, WHITE, CYAN, BLACK, "+", 3);
+    on_btn.initButton(&tft,  60, 200, 100, 40, WHITE, CYAN, BLACK,  "+", 3);
     off_btn.initButton(&tft, 180, 200, 100, 40, WHITE, CYAN, BLACK, "-", 3);
     exit_btn.initButton(&tft, 120, 250, 150, 40, WHITE, CYAN, BLACK, "Save", 2);
     on_btn.drawButton(false);
@@ -252,7 +289,7 @@ float therm_setup( String HeadMsg , float therm ){
     }
     if (exit_btn.justPressed()) {
         exit_btn.drawButton(true);
-        tft.fillRect(40, 80, 160, 80, MAGENTA);
+      //  tft.fillRect(40, 80, 160, 80, MAGENTA);
         save_therm = false ;
     }
   }
@@ -276,15 +313,15 @@ float mode_setup( ){
     Pellet_btn.drawButton(false);
     Oil_btn.drawButton(false);
     exit_btn.drawButton(false);
-
-   header1("mode_setup");
-
+    String Shead = "" ;
+    Shead =  " Mode Setup " ;  
+    header1( "Επιλογή->"+ Shead );
+   
   tft.fillRect(40, 80, 160, 80, RED);
   while (save_therm) {  
     tft.setCursor(50,100);
     tft.setTextSize(2);
     tft.setTextColor(WHITE);
-    
     if (Pellet_on){
      tft.print(  "Pellet"  );
      Levitas = "L01" ;
@@ -321,6 +358,7 @@ float mode_setup( ){
         // grafh sto fillRect thn epilogh
         Pellet_on = true ;
         Oil_on = false ;
+       
     }
     if (Oil_btn.justPressed()) {
           Oil_btn.drawButton(true);
@@ -331,7 +369,7 @@ float mode_setup( ){
     }
     if (exit_btn.justPressed()) {
         exit_btn.drawButton(true);
-        tft.fillRect(40, 80, 160, 80, MAGENTA);
+       // tft.fillRect(40, 80, 160, 80, MAGENTA);
         save_therm = false ;
        EEPROM.put( 40,Pellet_on);
        EEPROM.put( 50,Oil_on);
@@ -347,84 +385,162 @@ float mode_setup( ){
 //-------------------------------------------
 void header1( String  Msg   ) {  
 //-------------------------------------------  
+
      tft.fillRect(20, 10, 200 , 40, RED);
-     tft.setCursor(30,30);
-     tft.setFont(&Greek_Sigismundus8pt7b);
-     tft.setTextSize(1);
-     tft.setTextColor(WHITE);
-         
-     tft.print( Msg  );
-     tft.setFont();
+       
+    tft.setTextSize(5);
+    tft.setTextColor(WHITE);
+    u8g2_for_adafruit_gfx.setFontMode(1);
+    u8g2_for_adafruit_gfx.setForegroundColor(WHITE); 
+    u8g2_for_adafruit_gfx.setCursor(30,30);                // start writing at this position
+    u8g2_for_adafruit_gfx.print( Msg);    
+    u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek); 
+    
+    u8g2_for_adafruit_gfx.drawUTF8( 60,450, "Μυρίσκος Ιωάννης" );
+    u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek); 
+    u8g2_for_adafruit_gfx.setFontMode(1);
+    u8g2_for_adafruit_gfx.setForegroundColor(WHITE); 
+   
      tft.setTextSize(2);
 }
 //----------------------------------------
 void dispScreen(){
 //----------------------------------------
 //---------Διαχ/ση Relay Λέβητα ( Pellet ή Oil  )------ 
-     tft.setCursor(140,90);
+     tft.setCursor(160,90);
      tft.print(  therm1  );
      if ( therm0 >= therm1 ) {
        if (Pellet_on) {
-        tft.fillRect(210,90, 20,20, RED) ; 
+       // tft.fillRect(220,90, 15,15, RED) ; 
+        tft.fillCircle(230, 95, 8, RED);
         digitalWrite(Relay_01,HIGH);
         CL = "L02" ;
        } 
        else if(Oil_on) {
-        tft.fillRect(210,90, 20,20, RED) ; 
+        //tft.fillRect(220,90, 15,15, RED) ; 
+		tft.fillCircle(230, 95, 8, RED);
         digitalWrite(Relay_02,HIGH);  
         CL = "L02" ;
       }
      }  
-     else if ( therm0 <= therm1-2 ) {  
+     else if ( therm0 <= therm1-1 ) {  
        if (Pellet_on) {
-        tft.fillRect(210,90, 20,20, GREEN) ; 
+       // tft.fillRect(220,90, 15,15, GREEN) ; 
+        tft.fillCircle(230, 95, 8, GREEN);
         digitalWrite(Relay_01,LOW);
         CL = "L01" ;
        }
        else if (Oil_on) {
-        tft.fillRect(210,90, 20,20, GREEN) ; 
+        //tft.fillRect(220,90, 15,15, GREEN) ; 
+        tft.fillCircle(230, 95, 8, GREEN);
         digitalWrite(Relay_02,LOW);
         CL = "L01" ;
        }
      }   
-     else tft.fillRect(210,90, 20,20, YELLOW) ;
+     //else tft.fillRect(260,90, 15,15, YELLOW) ;
+     else tft.fillCircle(230, 95, 8, YELLOW);   
    //---------Διαχ/ση Relay Κυκλοφοριτή----------------     
-     tft.setCursor(140,140);
+     tft.setCursor(160,140);
      tft.print(  therm2  );
      if ( therm0 >= therm2 ) {
-        tft.fillRect(210,140, 20,20, GREEN);
+        //tft.fillRect(220,140, 15,15, GREEN);
+        tft.fillCircle(230,145, 8, GREEN);
         digitalWrite(Relay_03,LOW);
         CK = "K01" ;
      }  
-     else if ( therm0 <= therm2-2 ) {  
-        tft.fillRect(210,140, 20,20, RED) ; 
+     else if ( therm0 <= therm2- 0.50 ) {  
+        //tft.fillRect(220,140, 15,15, RED) ; 
+        tft.fillCircle(230,145, 8, RED);
         digitalWrite(Relay_03,HIGH);
         CK = "K02" ;
      }  
-     else tft.fillRect(210,140, 20,20, YELLOW) ; 
+     //else tft.fillRect(220,140, 15,15, YELLOW) ; 
+     else tft.fillCircle(230,145, 8, YELLOW); 
   //---------Διαχ/ση Relay Boiller   ----------------- 
-     tft.setCursor(140,190);
+     tft.setCursor(160,190);
      tft.print(  therm3  );
-     if ( therm0 >= therm3 ) {
-        tft.fillRect(210,190, 20,20, GREEN);
+     if ( therm0 >= therm03 && therm0 >= therm3  ) {
+        //tft.fillRect(220,190, 15,15, GREEN);
+        tft.fillCircle(230,195, 8, GREEN);
         digitalWrite(Relay_04,LOW);
         CB = "B01" ;
      }  
-     else if  ( therm0 <= therm3-2 ) {   
-        tft.fillRect(210,190, 20,20, RED)  ; 
+    // else if  ( therm0 <= therm3- 0.50 ) {   
+      else if ( therm0 <= therm03- 0.50 || therm0 <= therm3- 0.50  ) {
+        //tft.fillRect(220,190, 15,15, RED)  ;
+        tft.fillCircle(230,195, 8, RED); 
         digitalWrite(Relay_04,HIGH);
         CB = "B02" ;
      }   
-     else tft.fillRect(210,190, 20,20, YELLOW)  ;
+     //else tft.fillRect(220,190, 15,15, YELLOW)  ;
+     else tft.fillCircle(230,195, 8, YELLOW); 
    //---------------------------------------------   
- 
-     tft.fillRect(80,240, 120,20,BLACK);
-     tft.setTextSize(3); 
+  
      tft.setTextColor(WHITE);
-     tft.setCursor(80,240);
-     tft.print(  therm0  );
-     tft.setTextSize(2);
+     tft.fillRect(80,240,120,40,BLACK);
+     tft.setTextSize(3); 
+     tft.setTextColor(YELLOW);
+     tft.setCursor(80,245);
+     tft.print( therm0);
+     tft.setTextColor(WHITE);
+   
+//     u8g2_for_adafruit_gfx.setFont(u8g2_font_unifont_t_weather ); 
+//     u8g2_for_adafruit_gfx.setCursor(40,250);                
+//     u8g2_for_adafruit_gfx.print( 1 );
+     u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek);
+     tft.setTextSize(2); 
 }
+
+/// GFX drawBitmap() expects each row to be on 8-bit boundary.  i.e. pad = 7
+// Mono BMP rows are on 32-bit boundary. i.e. pad = 31,  rows are in RVS order.
+// FreeFont bitmaps have no padding.  i.e. pad = 0.   e.g. 5x4 bitmap is in 3 bytes
+//-----------------------------------
+void showbgd(int x, int y, const uint8_t *bmp, int w, int h, uint16_t color, uint16_t bg, uint8_t pad = 7){
+//-----------------------------------  
+    int yy, xx;
+    uint8_t first = 1, RVS = pad & 0x80;
+    uint16_t pixel;
+    pad &= 31;
+    uint16_t wid = (w + pad) & ~pad;                    //bits per row
+    tft.setAddrWindow(x, y, x + w - 1, y + h - 1); //
+    for (yy = 0; yy < h; yy++) {
+        uint32_t ofs = (RVS ? (h - yy - 1) : yy) * wid; //bit offset
+        const uint8_t *p = bmp + (ofs >> 3);            //flash address
+        uint8_t mask = 0x80 >> (ofs & 7);               //bit mask
+        uint8_t c = pgm_read_byte(p++);
+        for (xx = 0; xx < w; xx++) {
+            if (mask == 0) {
+                c = pgm_read_byte(p++);
+                mask = 0x80;
+            }
+            pixel = (c & mask) ? color : bg;
+            tft.pushColors(&pixel, 1, first);
+            first = 0;
+            mask >>= 1;
+        }
+    }
+    tft.setAddrWindow(0, 0, tft.width() - 1, tft.height() - 1);
+}
+//-----------------------------------
+void msg_time(int x, int y, String msg, uint32_t t) {
+//-----------------------------------  
+    t = millis() - t;
+    tft.setCursor(x, y);
+    tft.print(msg);
+    tft.print(t);
+    tft.print(F("ms"));
+}
+
+
+//-----------------------------------
+void ESP_Reset(){
+//-----------------------------------  
+
+  Serial.print( "ESP_Reset."  );  
+
+}
+
+
 
 //-----------------------------------
 void bootSreen() {

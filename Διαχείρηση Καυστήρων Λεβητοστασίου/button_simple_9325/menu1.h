@@ -1,23 +1,36 @@
+bool ESP_Live = false ;
 //--------------------------------------------
 void menu1(){
 //--------------------------------------------
-
- therm1_btn.initButton(&tft,  60, 100, 100, 40, WHITE, CYAN, BLACK, "levitas1", 2);
- therm2_btn.initButton(&tft,  60, 150, 100, 40, WHITE, CYAN, BLACK, "kiklofo1", 2);
- therm3_btn.initButton(&tft,  60, 200, 100, 40, WHITE, CYAN, BLACK, "boiller1", 2);
+//#include "bitmap_mono.h"
+ therm1_btn.initButton(&tft,  80, 100, 140, 30, WHITE, RED, BLACK, "", 2);
+ therm2_btn.initButton(&tft,  80, 150, 140, 30, WHITE, RED, BLACK, "", 2);
+ therm3_btn.initButton(&tft,  80, 200, 140, 30, WHITE, RED, BLACK, "", 2);
  therm1_btn.drawButton(false);
  therm2_btn.drawButton(false);
  therm3_btn.drawButton(false);
 
- PreviewMenu_btn.initButton(&tft,  40, 300, 50, 40, WHITE, CYAN, BLACK, " < ", 3);
- NextMenu_btn.initButton(&tft,    120, 300, 50, 40, WHITE, CYAN, BLACK, " > ", 3);
- mode_btn.initButton(&tft,    200, 300, 50, 40, WHITE, RED, BLACK, "Mode", 2);
+ PreviewMenu_btn.initButton(&tft,  40, 300, 40, 40, WHITE, CYAN, BLACK, "<", 3);
+ NextMenu_btn.initButton(&tft,    120, 300, 40, 40, WHITE, CYAN, BLACK, ">", 3);
+// PreviewMenu_btn.initButton(&tft,  40, 300, 40, 40, WHITE, CYAN, BLACK, "", 3);
+// NextMenu_btn.initButton(&tft,    120, 300, 40, 40, WHITE, CYAN, BLACK, "", 3);
+ mode_btn.initButton(&tft,    200, 300, 60, 40, WHITE, RED, BLACK, "Mode", 2);
  PreviewMenu_btn.drawButton(false);
  NextMenu_btn.drawButton(false);
  mode_btn.drawButton(false);
-
+ 
+     u8g2_for_adafruit_gfx.setFontMode(1); 
+     u8g2_for_adafruit_gfx.setForegroundColor(WHITE);
+     u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek); 
+     
+     tft.fillRect(40,235, 220,40,BLACK); 
+     u8g2_for_adafruit_gfx.setCursor(40,235);                
+     u8g2_for_adafruit_gfx.print( "θερμ. Νερών Λέβητα");
+      
+//tft.drawBitmap(220, 0, tractor_128x64, 128, 64, GREEN);
 
  bool While_menu = true ;
+ dispMenu = true ;
  while (While_menu) {
      bool menudown = Touch_getXY();
      therm1_btn.press(menudown && therm1_btn.contains(pixel_x, pixel_y));
@@ -28,36 +41,74 @@ void menu1(){
      mode_btn.press(menudown && mode_btn.contains(pixel_x, pixel_y));
      
  if (dispMenu){
+ 
       ReadSensor: 
-      sensors.requestTemperatures ();
-    //  therm03=(sensors.getTempCByIndex(2)); 
+      sensors1.requestTemperatures ();
+      sensors2.requestTemperatures ();
+      sensors3.requestTemperatures ();
+      sensors4.requestTemperatures ();
+    //  therm03=(sensors3.getTempCByIndex(0)); 
  
     String Shead = "" ;
     if (Pellet_on){
      Shead =  "Pellet" ;
-    // therm0=(sensors.getTempCByIndex(0));  
+    // therm0=(sensors1.getTempCByIndex(0));  
     // delay(100) ;
     }
     else if (Oil_on) {
      Shead =  " Oil  " ; 
-    // therm0=(sensors.getTempCByIndex(1));  
+    // therm0=(sensors2.getTempCByIndex(0));  
     // delay(100) ;
    }
     else {
      Shead =  " No Mode " ; 
     }
   
-     header1("EPILOGH->"+ Shead );
+     header1( "Επιλογή->"+ Shead );
   
-          therm1_btn.drawButton();   
-          therm2_btn.drawButton();   
-          therm3_btn.drawButton(); 
-     
-     tft.setFont() ;
-
+       therm1_btn.drawButton();   
+       therm2_btn.drawButton();   
+       therm3_btn.drawButton(); 
+       
+       
        PreviewMenu_btn.drawButton();
        NextMenu_btn.drawButton();
        mode_btn.drawButton();
+        
+
+
+       u8g2_for_adafruit_gfx.setCursor(20,100);                // start writing at this position
+       u8g2_for_adafruit_gfx.print( "Λέβητας");  
+       u8g2_for_adafruit_gfx.setCursor(20,150);                // start writing at this position
+       u8g2_for_adafruit_gfx.print( "Κυκλοφ/τής");
+       u8g2_for_adafruit_gfx.setCursor(20,201);                // start writing at this position
+       u8g2_for_adafruit_gfx.print( "Μπόϊλερ"); 
+ 
+       
+//       u8g2_for_adafruit_gfx.setFont(u8g2_font_unifont_h_symbols); 
+//       u8g2_for_adafruit_gfx.drawGlyph(35,310,0x23f4);  
+//       u8g2_for_adafruit_gfx.drawGlyph(115,310,0x23f5);  
+
+//
+//            // https://github.com/olikraus/u8g2/wiki/fnticons
+//            u8g2_for_adafruit_gfx.setFont( u8g2_font_iconquadpix_m_all ); 
+//            u8g2_for_adafruit_gfx.setCursor(35,310);                
+//            u8g2_for_adafruit_gfx.print( 65 );
+//            u8g2_for_adafruit_gfx.setCursor(115,310);                
+//            u8g2_for_adafruit_gfx.print( 68 );
+ 
+
+
+       
+       u8g2_for_adafruit_gfx.setFontMode(1);
+       u8g2_for_adafruit_gfx.setForegroundColor(WHITE); 
+       u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek); 
+     
+       tft.setFont() ;
+
+//       PreviewMenu_btn.drawButton();
+//       NextMenu_btn.drawButton();
+//       mode_btn.drawButton();
 
    // if (therm0 < 0 ) ; goto ReadSensor ; 
    
@@ -67,7 +118,7 @@ void menu1(){
      dispMenu = false ;
    
  }  
-       //------------------------ ��������� ������������ ----
+       //------------------------ Εικονικες θερμοκρασίες ----
        if (millis() - previousMillis2 >= (intervalDisp2 * timer2 )  ) {
            previousMillis2 = millis();   
           if (Up)   therm0 = therm0 + 0.50 ; 
@@ -81,32 +132,89 @@ void menu1(){
        }  
        //---------------------------------------------------
  
-            //sensors.requestTemperatures ();
-            //therm03=(sensors.getTempCByIndex(2));
+            //sensors3.requestTemperatures ();
+            //therm03=(sensors3.getTempCByIndex(0));
               String Shead = "" ;
               if (Pellet_on){
                Shead =  "Pellet" ;
                Levitas = "L01" ;
-              // therm0=(sensors.getTempCByIndex(0));  
+              // therm0=(sensors1.getTempCByIndex(0));  
               // delay(100) ;
               }
               else if (Oil_on) {
                Shead =  " Oil  " ;
                Levitas = "L02" ; 
-              // therm0=(sensors.getTempCByIndex(1));  
+              // therm0=(sensors2.getTempCByIndex(0));  
               // delay(100) ;
              }
               else {
                Shead =  " No Mode " ; 
               }
-         //-------------------------------------------
-       
-           strSendSereal = String('T')+String(therm0)+String('T')+String(therm3); 
-           strSendSereal+= String('T')+String(therm1)+String('T')+String(therm2)+String('T')+String(therm3); 
-           strSendSereal+= String( Levitas ) ;
-           strSendSereal+= String( CL )+String( CK)+String( CB ) ;
-           SerialMega.println(strSendSereal);
-        Serial.println(strSendSereal);
+         //------------Sent Data with String-------------------------------
+               strSendSereal = String('T')+String(therm0)+String('T')+String(therm03); 
+               strSendSereal+= String('T')+String(therm1)+String('T')+String(therm2)+String('T')+String(therm3); 
+               strSendSereal+= String( Levitas ) ;
+               strSendSereal+= String( CL )+String( CK)+String( CB ) ;
+
+         //------------Sent Data with json-------------------------------  
+              // Send Data from ArduinoMega Serial3 to Esp8266 
+              StaticJsonBuffer<1000> jsonBuffer;
+              JsonObject& root = jsonBuffer.createObject();
+              root["therm0"]  = String(therm0);
+              root["therm03"] = String(therm03);
+              root["therm1"]  = String(therm1);
+              root["therm2"]  = String(therm2);
+              root["therm3"]  = String(therm3);
+              root["Levitas"] = String( Levitas );
+              root["CL"] = String(CL);
+              root["CK"] = String(CK);
+              root["CB"] = String(CB);
+
+
+           
+           if (millis() - previousMillis3 >= (intervalDisp3 * timer3 )  ) {
+             previousMillis3 = millis();  
+
+             
+             Serial3.println(strSendSereal);
+             Serial.println(strSendSereal);
+
+          //---  watchdog --------------------
+              int watchdog_delimiter1, watchdog_delimiter2;
+              String watchdog = "0" ;
+              String watchdog_Read =  Serial2.readString() ;
+              watchdog_delimiter1 = watchdog_Read.indexOf("%");
+              watchdog_delimiter2 = watchdog_Read.indexOf("%", watchdog_delimiter1 + 1);
+              watchdog = watchdog_Read.substring(watchdog_delimiter1 + 1, watchdog_delimiter2);
+              if ( watchdog == "1"){
+                ESP_Live = true ;
+              }
+               
+                   Serial.println(watchdog);
+
+                   if ( watchdog != "1"   ) {  
+                     tft.fillRect(20, 40, 200 , 30, BLACK);
+                     u8g2_for_adafruit_gfx.setFontMode(1);
+                     u8g2_for_adafruit_gfx.setForegroundColor(WHITE); 
+                     u8g2_for_adafruit_gfx.setCursor(30,70);  
+                     u8g2_for_adafruit_gfx.print( "ESP_is_dead");
+                                        
+                   } 
+                   else {
+                     tft.fillRect(20, 40, 200 , 30, BLACK);
+                     u8g2_for_adafruit_gfx.setFontMode(1);
+                     u8g2_for_adafruit_gfx.setForegroundColor(WHITE); 
+                     u8g2_for_adafruit_gfx.setCursor(30,70);  
+                     u8g2_for_adafruit_gfx.print( "ESP_is_Live ");
+                  }
+                   
+                  if (ESP_Live  && watchdog != "1"   ) {
+                     ESP_Reset() ;
+                    
+                  }
+             
+           }
+          
            if (millis() - previousMillis >= (intervalDisp * timer )  ) {
              previousMillis = millis();  
              dispScreen() ; 
@@ -116,17 +224,17 @@ void menu1(){
   
     if (therm1_btn.justPressed()) {
         therm1_btn.drawButton(true);
-        therm1 =   therm_setup( "Lebhtas" , therm1   ) ;
+        therm1 =   therm_setup( "Λέβητας" , therm1   ) ;
         EEPROM.put( 10,therm1);
     }
     if (therm2_btn.justPressed()) {
         therm2_btn.drawButton(true);
-        therm2 =   therm_setup( "Kykloforiths" , therm2   ) ;
+        therm2 =   therm_setup( "Κυκλοφοριτής" , therm2   ) ;
         EEPROM.put( 20,therm2);
     }
     if (therm3_btn.justPressed()) {
         therm3_btn.drawButton(true);
-        therm3 =   therm_setup( "Boiler" , therm3   ) ;
+        therm3 =   therm_setup( "Μπόϊλερ" , therm3   ) ;
         EEPROM.put( 30,therm3);
     }  
 
