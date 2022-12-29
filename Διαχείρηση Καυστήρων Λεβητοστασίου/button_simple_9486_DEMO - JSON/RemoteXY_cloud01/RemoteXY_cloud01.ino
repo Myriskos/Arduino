@@ -19,70 +19,49 @@
 //        RemoteXY include library          //
 //////////////////////////////////////////////
 
-// RemoteXY select connection mode and include library 
-#define REMOTEXY_MODE__ESP8266WIFI_LIB_CLOUD
+//// RemoteXY select connection mode and include library 
+//#define REMOTEXY_MODE__ESP8266WIFI_LIB_CLOUD
 #include <ESP8266WiFi.h>
-
+//
 #include <RemoteXY.h>
-
-// RemoteXY connection settings 
-#define REMOTEXY_WIFI_SSID "" //"dbSoft"
-#define REMOTEXY_WIFI_PASSWORD "" // "xVf5nTEN"
-#define REMOTEXY_CLOUD_SERVER "cloud.remotexy.com"
-#define REMOTEXY_CLOUD_PORT 6376
-//#define REMOTEXY_CLOUD_TOKEN "16fc05194613e331f4df167717f19ac5"  // ILI9341
-#define REMOTEXY_CLOUD_TOKEN "078a2fb13ad44666194d3dbd124c4332"  // ILI9486  - ILI9327 
+//
+//// RemoteXY connection settings 
+//#define REMOTEXY_WIFI_SSID "" //"dbSoft"
+//#define REMOTEXY_WIFI_PASSWORD "" // "xVf5nTEN"
+//#define REMOTEXY_CLOUD_SERVER "cloud.remotexy.com"
+//#define REMOTEXY_CLOUD_PORT 6376
+////#define REMOTEXY_CLOUD_TOKEN "16fc05194613e331f4df167717f19ac5"  // ILI9341
+//#define REMOTEXY_CLOUD_TOKEN "078a2fb13ad44666194d3dbd124c4332"  // ILI9486  - ILI9327 
 
 
 // RemoteXY configurate  
 #pragma pack(push, 1)
-uint8_t RemoteXY_CONF[] =
-  { 255,0,0,135,0,192,1,11,13,4,
-  66,132,14,17,14,11,0,2,24,67,
-  5,8,30,26,10,0,2,26,11,66,
-  132,42,15,10,8,2,2,24,66,132,
-  42,25,10,8,2,2,24,66,132,42,
-  34,10,8,2,2,24,65,23,69,16,
-  6,6,2,65,7,69,25,6,6,2,
-  65,7,69,34,6,6,2,129,0,30,
-  0,34,5,0,17,206,155,206,181,206,
-  178,206,183,207,132,206,191,207,131,207,
-  132,206,172,207,131,206,185,206,191,0,
-  129,0,8,43,25,4,0,17,206,157,
-  206,181,207,129,206,172,32,206,155,206,
-  173,206,178,206,183,207,132,206,177,0,
-  129,0,61,43,28,4,1,17,206,157,
-  206,181,207,129,206,172,32,206,156,207,
-  128,207,140,207,138,206,187,206,181,207,
-  129,0,129,0,80,35,17,4,2,17,
-  206,156,207,128,207,140,206,185,206,187,
-  206,181,207,129,0,66,132,42,44,10,
-  8,2,2,24,65,7,69,44,6,6,
-  2,67,4,54,16,14,6,2,2,26,
-  11,67,4,54,25,14,6,2,2,26,
-  11,67,4,54,34,14,6,2,2,26,
-  11,67,4,54,44,14,6,2,2,26,
-  11,129,0,8,9,27,3,1,17,206,
-  149,206,189,206,181,207,129,206,179,207,
-  140,207,130,32,206,155,206,173,206,178,
-  206,183,207,132,206,177,207,130,32,58,
-  0,67,5,37,8,25,5,1,2,26,
-  51,129,0,79,16,20,4,2,17,206,
-  155,206,173,206,178,206,183,207,132,206,
-  177,32,32,203,154,67,0,129,0,79,
-  25,27,4,2,17,206,154,207,133,206,
-  186,206,187,206,191,207,134,206,191,207,
-  129,206,183,207,132,206,174,0,66,132,
-  67,18,13,10,1,2,24,67,5,61,
-  30,26,10,1,2,26,11,131,1,34,
-  55,16,5,1,2,31,80,97,103,101,
-  49,0,131,0,54,55,14,5,2,2,
-  31,80,97,103,101,50,0,129,0,16,
-  7,55,5,2,17,206,152,206,181,207,
-  129,206,188,206,191,206,186,207,129,206,
-  177,207,131,206,175,206,181,207,130,32,
-  206,181,206,187,206,173,206,179,207,135,
-  206,191,207,133,0 };
+uint8_t RemoteXY_CONF[] =   // 490 bytes
+  { 255,0,0,134,0,227,1,16,13,4,66,132,14,17,14,11,1,2,24,67,
+  5,8,30,26,10,1,2,26,11,66,132,14,15,10,8,2,2,24,66,132,
+  15,27,10,8,2,2,24,66,132,16,37,10,8,2,2,24,65,112,46,16,
+  6,6,2,65,112,47,27,6,6,2,65,112,47,37,6,6,2,129,0,30,
+  0,34,5,0,17,206,155,206,181,206,178,206,183,207,132,206,191,207,131,207,
+  132,206,172,207,131,206,185,206,191,0,129,0,9,43,25,4,1,17,206,157,
+  206,181,207,129,206,172,32,206,155,206,173,206,178,206,183,207,132,206,177,0,
+  129,0,40,43,28,4,1,17,206,157,206,181,207,129,206,172,32,206,156,207,
+  128,207,140,207,138,206,187,206,181,207,129,0,129,0,58,39,17,4,2,17,
+  206,156,207,128,207,140,206,185,206,187,206,181,207,129,0,66,132,79,18,13,
+  10,1,2,24,65,96,83,8,6,6,1,67,4,28,16,14,6,2,2,26,
+  11,67,4,29,27,14,6,2,2,26,11,67,4,29,37,14,6,2,2,26,
+  11,67,4,74,30,24,10,1,2,26,11,129,0,14,9,27,3,1,17,206,
+  149,206,189,206,181,207,129,206,179,207,140,207,130,32,206,155,206,173,206,178,
+  206,183,207,132,206,177,207,130,32,58,0,67,5,41,8,25,5,1,2,26,
+  51,129,0,57,16,20,4,2,17,206,155,206,173,206,178,206,183,207,132,206,
+  177,32,32,203,154,67,0,129,0,57,28,27,4,2,17,206,154,207,133,206,
+  186,206,187,206,191,207,134,206,191,207,129,206,183,207,132,206,174,0,66,132,
+  44,18,13,10,1,2,24,67,5,40,30,26,10,1,2,26,11,131,1,32,
+  55,16,5,1,2,31,80,97,103,101,49,0,131,0,58,55,14,5,2,2,
+  31,80,97,103,101,50,0,129,0,22,7,55,5,2,17,206,152,206,181,207,
+  129,206,188,206,191,206,186,207,129,206,177,207,131,206,175,206,181,207,130,32,
+  206,181,206,187,206,173,206,179,207,135,206,191,207,133,0,129,0,71,43,30,
+  4,1,17,206,149,207,128,206,185,207,131,207,132,207,129,206,181,207,134,207,
+  140,206,188,206,181,206,189,206,177,0 };
   
 // this structure defines all the variables and events of your control interface 
 struct {
@@ -105,7 +84,6 @@ struct {
   int8_t level_4; // =0..100 level position 
   uint8_t led_4_r; // =0..255 LED Red brightness 
   uint8_t led_4_g; // =0..255 LED Green brightness 
-  uint8_t led_4_b; // =0..255 LED Blue brightness 
   char text_1[11];  // string UTF8 end zero 
   char text_2[11];  // string UTF8 end zero 
   char text_3[11];  // string UTF8 end zero 
@@ -125,10 +103,11 @@ struct {
 /////////////////////////////////////////////
 
 #include <SoftwareSerial.h>
-SoftwareSerial s(D5,D6);    // TX-RX 16,17  Serial2
-SoftwareSerial s2(D7,D8);   //  TX-RX 14,15  Serial3
+SoftwareSerial s(D5,D6);    // TX-RX 14,15  Serial2
+SoftwareSerial s2(D7,D8);   //  TX-RX 16,17  Serial3
 
 #include <ArduinoJson.h>
+
 /*
   MEGA        ESP8266 NODE MCU
   TX16 -----> D6
@@ -136,9 +115,7 @@ SoftwareSerial s2(D7,D8);   //  TX-RX 14,15  Serial3
 
   SoftwareSerial SerialMega(16,17);    // TX-RX 5,6   ΣΤΟ MEGA
   SoftwareSerial ArduinoMega(D5,D6);   // TX-RX 16,17 ΣΤΟ ESP 
-  
 */ 
-
 
 #include <string.h>
 #include<stdio.h>
@@ -163,21 +140,13 @@ String c ;
     float therm_4 ;
     String CL , CK , CB ;
 
-
-
-
 //-------auto connect---------------------------
-        #include <DNSServer.h>
-        #include <ESP8266WebServer.h>
-        #include <ESP8266WiFiMulti.h>
         #include <WiFiManager.h>
-        ESP8266WiFiMulti WiFiMulti;
-       
         char con_ssid[32]; //will hold the ssid of the wlan to which it is connectd
         char con_psk[64];  // ^^ private shared key for the wlan (password)
  //------- end auto connect-------------------------
 
-
+CRemoteXY *remotexy;
 //------------------------------
 void setup(){
 //------------------------------  
@@ -194,60 +163,63 @@ void setup(){
   while (!s2) {
     Serial.print( "s2."  );  
   }  
-  
-// RemoteXY_Init (); 
-  
-//------------Start autoConnect--------------   
-// Set device as a Wi-Fi Station
-  WiFi.mode(WIFI_STA);
-
-
-    //--- settaggi di Wifimanager-------
-    WiFiManager wifiManager;
-    // wifiManager.resetSettings();
-    wifiManager.setTimeout(180); 
- 
-    if (!wifiManager.autoConnect("WiFi-ESP_A", "12345678")) // credenziali per accedere alla modalità AP
-    {
-      delay(3000);
-      ESP.reset();
-      delay(5000);
-    }
-    WiFi.SSID().toCharArray(con_ssid, 32);
-    WiFi.psk().toCharArray(con_psk, 64);
     
-    remotexy = new CRemoteXY (RemoteXY_CONF_PROGMEM, &RemoteXY, REMOTEXY_ACCESS_PASSWORD,  con_ssid , con_psk, REMOTEXY_CLOUD_SERVER, REMOTEXY_CLOUD_PORT, REMOTEXY_CLOUD_TOKEN );
-     //------------end autoConnect-------------- 
-    //Serial.print( RemoteXY.connect_flag );   
+    StartConect();
+    StartRemoteXY();
+ 
 }
 
 //------------------------------
 void readSerialMega(){
 //------------------------------ 
-      c =  s.readString() ;
-      
-    //c = "T72.50T45.00T75.00T40.00T45.00L01L01K01B01" ;
-     Serial.println( c  );
-      b = c.substring(1 ,6);
-      d = c.substring(7 ,12);
-  therm1= c.substring(13,18);   
-  therm2= c.substring(19,24);   
-  therm3= c.substring(25,30);
-  Levitas=c.substring(30,33);
-  CL = c.substring(33,36);  
-  CK = c.substring(36,39);
-  CB = c.substring(39,42); 
+        c =  s.readString() ;
+        Serial.println( c  );
 
-}
+        int delimiter0 = c.indexOf('|'); 
+        int delimiter1 = c.indexOf('|' ,delimiter0 +1 ); 
+        int delimiter2 = c.indexOf('|' ,delimiter1 +1 ); 
+        int delimiter3 = c.indexOf('|' ,delimiter2 +1 ); 
+        int delimiter4 = c.indexOf('|' ,delimiter3 +1 ); 
+        int delimiter5 = c.indexOf('|' ,delimiter4 +1 ); 
+        int delimiter6 = c.indexOf('|' ,delimiter5 +1 ); 
+        int delimiter7 = c.indexOf('|' ,delimiter6 +1 ); 
+        int delimiter8 = c.indexOf('|' ,delimiter7 +1 ); 
+        int delimiter9 = c.indexOf('|' ,delimiter8 +1 ); 
+        int delimiter10 = c.indexOf('|',delimiter9 +1 );
+      
+        b =     c.substring(delimiter0 + 1, delimiter1);
+        d =     c.substring(delimiter1 + 1, delimiter2);
+        therm1= c.substring(delimiter2 + 1, delimiter3);
+        therm2= c.substring(delimiter3 + 1, delimiter4); 
+        therm3= c.substring(delimiter4 + 1, delimiter5);
+        Levitas=c.substring(delimiter5 + 1, delimiter6);
+        CL =    c.substring(delimiter6 + 1, delimiter7);
+        CK =    c.substring(delimiter7 + 1, delimiter8);
+        CB =    c.substring(delimiter8 + 1, delimiter9);
+        e =     c.substring(delimiter9 + 1, delimiter10);
+   }
 
 //----------------------------
 void loop() {
 //---------------------------   
- 
-  RemoteXY_Handler ();
+// RemoteXY_Handler ();
+ remotexy->handler ();
+   ESP.wdtDisable();
+   ESP.wdtEnable(0);
+   ESP.wdtFeed();
+// while (true) {}   // για test wdt
+
+  /*
+      watchdog = "%1%" ; 
+   Αυτο το στέλνει sto MEGA με Serial
+   Αν για καποιο λογο το MEGA δεν το πάρει
+   θα κανει διακοπή παροχής VCC με Relay  
+   Ειναι ενα δεύτερο watchdog εκτός του 
+           ESP.wdtDisable()
+   */
  // watchdog = "%1%" ;
   s2.print( watchdog  );
-  
+    
  # if !JSON 
      readSerialMega();
  #else
@@ -278,17 +250,14 @@ void loop() {
  
    therm_1 = b.toFloat();  // Νερά Λέβητα 
    therm_2 = d.toFloat();  // Νερά Μπόϊλερ
- //  therm_4 = e.toFloat();  // Επισρεφόμενα 
-   
+   therm_4 = e.toFloat();  // Επισρεφόμενα 
   // Page1   
    
    if ( Levitas == "L01" ){
-    // RemoteXY.text_0 = "Pellet" ;
-     strcpy (RemoteXY.text_0 , "Pellet" ) ;
+      strcpy (RemoteXY.text_0 , "Pellet" ) ;
    }
    else if ( Levitas == "L02" ){
-     //RemoteXY.text_0 = "Oil" ;
-     strcpy (RemoteXY.text_0 , "Oil" ) ;
+      strcpy (RemoteXY.text_0 , "Oil" ) ;
    }
    // Νερά Λέβητα
    dtostrf(therm_1, 0, 2, RemoteXY.text_0_1);
@@ -296,6 +265,20 @@ void loop() {
    // Νερά Μπόϊλερ
    dtostrf(therm_2, 0, 2, RemoteXY.text_0_2);
    RemoteXY.level_0_2 = therm_2 ;
+
+   //if(therm_1 < therm_2.toFloat() ){ 
+   if(therm_1 > therm_2 ){  
+     RemoteXY.led_4_g =   0 ; 
+     RemoteXY.led_4_r = 200 ;
+     
+   }
+   else {
+     RemoteXY.led_4_g = 200 ;
+     RemoteXY.led_4_r =   0 ;
+     
+   }
+
+
 
   // Page2
    // Θερμοκρασία off Relay από Αισθητήρα Λέβητα 
@@ -309,13 +292,10 @@ void loop() {
    RemoteXY.level_3 = therm3.toFloat() ; 
 
    // Επισρεφόμενα
- //  dtostrf( therm_4   , 0, 2, RemoteXY.text_4);
- //  RemoteXY.level_4 = therm_4 ; 
-
-    
+   dtostrf( therm_4   , 0, 2, RemoteXY.text_4);
+   RemoteXY.level_4 = therm_4 ;
+   
   
-//  RemoteXY.led_1_r = xromaGreen( CL  ) ;
-//  RemoteXY.led_1_g = xromaRed(  CL   ) ; 
 
 //  Λέβητα
   if (CL == "L01") {
@@ -351,9 +331,51 @@ void loop() {
    RemoteXY.led_3_g =  0  ; 
   } 
   
-delay(500);
+delay(100); // 500
 
 }
+
+void StartConect(){
+    //------------Start autoConnect---- 
+    WiFiManager wifiManager;
+    // wifiManager.resetSettings();
+    wifiManager.setTimeout(180); 
+    if (!wifiManager.autoConnect("WiFi-ESP_A", "12345678")) // credenziali per accedere alla modalità AP
+    {
+      delay(3000);
+      ESP.reset();
+      delay(5000);
+    }
+    WiFi.SSID().toCharArray(con_ssid, 32);
+    WiFi.psk().toCharArray(con_psk, 64);
+     
+    Serial.println("");
+    Serial.print("Connected to WiFi network with IP Address: ");
+    Serial.println(WiFi.localIP());
+   //------------end autoConnect-----------
+}  
+
+void StartRemoteXY(){
+
+ CRemoteXYComm_WiFi * wifi =  new CRemoteXYComm_WiFi (
+    con_ssid,                            // REMOTEXY_WIFI_SSID
+    con_psk                                 // REMOTEXY_WIFI_PASSWORD
+  );
+  
+  remotexy = new CRemoteXY (RemoteXY_CONF_PROGMEM, &RemoteXY, "");
+  
+  remotexy->addConnection (new CRemoteXYConnectionServer ( wifi, 
+    6377                                      // REMOTEXY_SERVER_PORT
+  ));
+  
+  remotexy->addConnection (new CRemoteXYConnectionCloud ( wifi, 
+    "cloud.remotexy.com",                     // REMOTEXY_CLOUD_SERVER 
+    6376,                                     // REMOTEXY_CLOUD_PORT
+    "078a2fb13ad44666194d3dbd124c4332"                // REMOTEXY_CLOUD_TOKEN
+  ));
+}
+
+
 
 /*
 //-------------------------------

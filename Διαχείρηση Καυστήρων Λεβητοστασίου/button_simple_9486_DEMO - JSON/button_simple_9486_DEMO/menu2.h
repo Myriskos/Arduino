@@ -2,22 +2,20 @@
 //--------------------------------------------
 void menu2(){
 //--------------------------------------------
-//#include "bitmap_mono.h"    // 
-//#include "bitmap_RGB.h" 
+ wdt_disable(); // watchdog
+
 u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek); 
- therm1_btn.initButton(&tft,  80, 100, 150, 40, WHITE, BLACK, BLACK, "", 2);
- therm2_btn.initButton(&tft,  80, 150, 150, 40, WHITE, BLACK, BLACK, "", 2);
- therm3_btn.initButton(&tft,  80, 200, 150, 40, WHITE, BLACK, BLACK, "", 2);
+ therm1_btn.initButton(&tft,  80, 100, 150, 40, WHITE, BLUE, BLACK, "", 2);
+ therm2_btn.initButton(&tft,  80, 150, 150, 40, WHITE, BLUE, BLACK, "", 2);
+ therm3_btn.initButton(&tft,  80, 200, 150, 40, WHITE, BLUE, BLACK, "", 2);
  therm1_btn.drawButton(false);
  therm2_btn.drawButton(false);
  therm3_btn.drawButton(false);
 
- PreviewMenu_btn.initButton(&tft,  40, 400, 50, 40, WHITE, CYAN, BLACK, " < ", 3);
- NextMenu_btn.initButton(&tft,    120, 400, 50, 40, WHITE, CYAN, BLACK, " > ", 3);
+ PreviewMenu_btn.initButton(&tft,  40, 400, 50, 40, WHITE, CYAN, BLACK, "", 3);
+ NextMenu_btn.initButton(&tft,    120, 400, 50, 40, WHITE, CYAN, BLACK, "", 3);
  PreviewMenu_btn.drawButton(false);
  NextMenu_btn.drawButton(false);
-
-//tft.drawBitmap(220, 0, tractor_128x64, 128, 64, GREEN);
 
  bool save_therm1 = true ;
  dispMenu = true ;
@@ -30,7 +28,7 @@ u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek);
      NextMenu_btn.press(menudown && NextMenu_btn.contains(pixel_x, pixel_y));
      
    if (dispMenu){
-     header1("Μπόϊλερ");
+     header1("θερμοκρασίες. Νερών ");
      PreviewMenu_btn.drawButton();
      NextMenu_btn.drawButton();
      dispMenu = false ;
@@ -40,18 +38,27 @@ u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek);
      u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek); 
      tft.fillRect(50,250, 220,40,BLACK); 
      u8g2_for_adafruit_gfx.setCursor(50,280);             
-     u8g2_for_adafruit_gfx.print( "θερμ. Νερών Μπόϊλερ"); 
+     u8g2_for_adafruit_gfx.print( "θερμοκρασίες. Νερών "); 
 
      u8g2_for_adafruit_gfx.setCursor(20,100);                // start writing at this position
-     u8g2_for_adafruit_gfx.print( "Λέβητας");  
+     u8g2_for_adafruit_gfx.print( "Λέβητα   ");  
      u8g2_for_adafruit_gfx.setCursor(20,150);                // start writing at this position
-     u8g2_for_adafruit_gfx.print( "Κυκλοφοριτής");
+     u8g2_for_adafruit_gfx.print( "Μπόϊλερ  ");
      u8g2_for_adafruit_gfx.setCursor(20,201);                // start writing at this position
-     u8g2_for_adafruit_gfx.print( "Μπόϊλερ    "); 
-
-     
+     u8g2_for_adafruit_gfx.print( "Επιστρ/να"); 
 
     }  
+
+     //----------------------
+      tft.fillCircle(40, 400, 30, BLUE);                    //seek down button
+      tft.fillTriangle(35, 390, 25, 400, 35, 410, WHITE);
+      tft.fillTriangle(50, 390, 40, 400, 50, 410, WHITE);
+     //-----------------------
+      tft.fillCircle(120, 400, 30, BLUE);                       //seek up button
+      tft.fillTriangle(125, 390, 135, 400, 125, 410, WHITE);
+      tft.fillTriangle(110, 390, 120, 400, 110, 410, WHITE);
+     //-----------------------
+  
        
     if (NextMenu_btn.justPressed()) {
         NextMenu_btn.drawButton(true);
@@ -69,47 +76,65 @@ u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek);
           MenuCount = 1 ;
         }
         save_therm1 = false ;
-
      }
-   //----------------------εικονικη θερμοκρασία ΜπόΙλερ------------------------------------------------
+
+
+//    //->>>>> test Button 
+//    if ( therm04 > 30 ) {
+//      PreviewMenu_btn.drawButton(true);
+//      MenuCount = 1 ;
+//      save_therm1 = false ;
+//    }
+  
+     
+   //----------------------------------------------------------------------
       if (millis() - previousMillis2 >= (intervalDisp2 * timer2 )  ) {
         previousMillis2 = millis();   
 
-        if (Up)   therm03 = therm03 + 0.50 ; 
-          if (Down) therm03 = therm03 - 0.50 ;
-          if ( therm03 >= 80 ){
-            Down = true ; Up   = false ; 
-          }
-          if ( therm03 <= 30 ){
-            Up   = true ; Down = false ; 
-        }
+         sensors1.requestTemperatures ();
+         sensors2.requestTemperatures ();
+         sensors3.requestTemperatures ();
+         sensors4.requestTemperatures ();
+         
+         therm03=(sensors3.getTempCByIndex(0));
+         therm04=(sensors4.getTempCByIndex(0));
+         if (Pellet_on){
+            therm0=(sensors1.getTempCByIndex(0));
+         }
+         else if (Oil_on) {  
+            therm0=(sensors2.getTempCByIndex(0));
+         }
+          tft.setTextColor(WHITE);
+         // tft.fillRoundRect(180, 80, 140, 60,20, BLUE);
+          tft.fillRect(180, 80,140,60,BLACK);  
+          tft.fillRect(180,140,140,60,BLACK); 
+          tft.fillRect(180,190,140,60,BLACK); 
+          tft.setTextSize(2);
+          tft.setCursor(180,90);
+          tft.print( therm0);
+          tft.setCursor(180,140);
+          tft.print( therm03);
+          tft.setCursor(180,190);
+          tft.print( therm04);
 
-     
-//     
-//     u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek); 
-//     tft.fillRect(50,250, 220,40,BLACK); 
-//     u8g2_for_adafruit_gfx.setCursor(50,280);             
-//     u8g2_for_adafruit_gfx.print( "θερμ. Νερών Μπόϊλερ"); 
-//
-//     u8g2_for_adafruit_gfx.setCursor(20,100);                // start writing at this position
-//     u8g2_for_adafruit_gfx.print( "Λέβητας");  
-//     u8g2_for_adafruit_gfx.setCursor(20,150);                // start writing at this position
-//     u8g2_for_adafruit_gfx.print( "Κυκλοφοριτής");
-//     u8g2_for_adafruit_gfx.setCursor(20,201);                // start writing at this position
-//     u8g2_for_adafruit_gfx.print( "Μπόϊλερ    "); 
-        
-
-       tft.setTextColor(WHITE);
-       tft.fillRect(80,300,120,50,BLACK);
-       tft.setTextSize(3); 
-       tft.setTextColor(WHITE);
-       tft.setCursor(80,300);
-       tft.print( therm03);
-       tft.setTextSize(2);
+    
+         tft.setTextColor(WHITE);
+         tft.fillRect(80,300,120,50,BLACK);
+         tft.setTextSize(3); 
+         tft.setTextColor(WHITE);
+         tft.setCursor(80,300);
+         tft.print( therm0);
+         tft.setTextSize(2);
        
        
      }
   //----------------------------------------------------------------------
- }   
+ }  
+
+
+    tft.fillRect(180, 80,140,60,BLACK);  
+    tft.fillRect(180,140,140,60,BLACK); 
+    tft.fillRect(180,190,140,60,BLACK); 
+   
    
 }

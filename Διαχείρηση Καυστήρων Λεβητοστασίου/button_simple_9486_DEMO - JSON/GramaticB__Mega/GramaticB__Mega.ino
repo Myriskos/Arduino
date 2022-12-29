@@ -19,15 +19,24 @@
 #define CIANO     0x07FF
 #define CIANO_2   0x03EF
 #define MAGENTA 0xF81F
-#define XP 8
+//#define XP 8
+//#define XM A2
+//#define YP A3
+//#define YM 9
+#define XP 6
 #define XM A2
-#define YP A3
-#define YM 9
-#define TS_LEFT 78
-#define TS_RT 889
-#define TS_TOP 896
-#define TS_BOT 126
-#define ROTATION 1
+#define YP A1
+#define YM 7
+//#define TS_LEFT 78
+//#define TS_RT 889
+//#define TS_TOP 896
+//#define TS_BOT 126
+#define TS_LEFT 893
+#define TS_RT 108
+#define TS_TOP 931
+#define TS_BOT 120
+
+#define ROTATION 1  
 #define TOTAL_BOTOES 6
 
 ///////////////////////////////////////////////// OBJETOS ////////////////////////////////////
@@ -99,7 +108,8 @@ byte tela_Opcoes(){
   bool toque_Opcoes = false;
   tft.fillScreen(PRETO);
 
-  char bt2[8] = {'V', char(161), 'r', 'g', 'u', 'l', 'a', '\0'};
+//  char bt2[8] = {'V', char(161), 'r', 'g', 'u', 'l', 'a', '\0'};
+char bt2[8] = {'V', 'i', 'r', 'g', 'u', 'l', 'a', '\0'};
   char bt1[8] = {'A', 'n', char(134), 'l', 'i', 's', 'e', '\0' };
   botoes[0].initButton(&tft, 160,  95, 255, 50, BRANCO, CIANO, PRETO, (char *)bt1, 2);
   botoes[1].initButton(&tft, 160, 153, 255, 50, BRANCO, AZUL, PRETO, (char *)bt2, 2);
@@ -815,13 +825,18 @@ void desenha_botoes_virgula(byte num, byte total){
 /////////////////////////////////// Tela de apresentação
 
 void tela_Inicial(){
-
-
+//    u8g2_for_adafruit_gfx.begin(tft);
+//    u8g2_for_adafruit_gfx.setFontMode(1);                 // use u8g2 none transparent mode
+//    u8g2_for_adafruit_gfx.setFontDirection(0);            // left to right (this is default)
+//    u8g2_for_adafruit_gfx.setForegroundColor(PRETO);      // apply Adafruit GFX color
+//    u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek);
     tft.fillScreen(BRANCO);
     tft.setCursor(50,100);
     tft.setTextColor(PRETO);
     tft.setTextSize(3);
     tft.print(F("GramaticB"));
+//    u8g2_for_adafruit_gfx.setCursor(80,100); 
+//    u8g2_for_adafruit_gfx.print("Μυρίσκος ");
     tft.write(147);
     tft.print(" ");
     tft.setTextColor(VERMELHO);
@@ -1438,7 +1453,7 @@ void setup() {
 }
 ///////////////////////////////////////////// LOOP //////////////////////////////////////////////////
 void loop() {
-
+//  u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek); 
   byte opcao, nivel;
   bool flag_op;
 
