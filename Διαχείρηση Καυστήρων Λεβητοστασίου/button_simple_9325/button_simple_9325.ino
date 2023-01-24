@@ -14,8 +14,15 @@ U8G2_FOR_ADAFRUIT_GFX u8g2_for_adafruit_gfx;
 //SoftwareSerial SerialMega(16,17);   // TX-RX 5,6
 //SoftwareSerial SerialMega(14,15);   // TX-RX 5,6
 
-
+#define MODE_DEMO   true
 #include <ArduinoJson.h>   // Ver 5.xx
+
+#include <avr/wdt.h> // for watchdog timer
+volatile int counter;      // Count number of times ISR is called.
+volatile int countmax = 3; // Arbitrarily selected 3 for this example.
+                           // Timer expires after about 24 secs if
+                           // 8 sec interval is selected below.
+
 
 /*
   MEGA        ESP8266 NODE MCU
@@ -80,6 +87,7 @@ int  Relay_01 = A8 ;
 int  Relay_02 = A9 ;
 int  Relay_03 = A10 ;
 int  Relay_04 = A11 ;     // του boiller
+int  Relay_watchdog = A13 ;  // Relay watchdog - κόβει την τροφοδοσία του esp8266
 
 bool Relay_01_on = false ;
 bool Relay_02_on = false ;
@@ -220,7 +228,9 @@ bootSreen() ;
 void loop(void){
 //--------------------------------------------
 
-   u8g2_for_adafruit_gfx.setFontMode(1);                 // use u8g2 none transparent mode
+  watchdogEnable(); // set up watchdog timer in interrupt-only mode
+
+  u8g2_for_adafruit_gfx.setFontMode(1);                 // use u8g2 none transparent mode
   u8g2_for_adafruit_gfx.setFontDirection(0);            // left to right (this is default)
   u8g2_for_adafruit_gfx.setForegroundColor(WHITE);      // apply Adafruit GFX color
   
@@ -241,12 +251,15 @@ void loop(void){
 //--------------------------------------------
 float therm_setup( String HeadMsg , float therm ){
 //--------------------------------------------
-
+   wdt_disable(); // watchdog
+   
     bool save_therm = true ;
     tft.fillScreen(BLACK);
 
-    on_btn.initButton(&tft,  60, 200, 100, 40, WHITE, CYAN, BLACK,  "+", 3);
-    off_btn.initButton(&tft, 180, 200, 100, 40, WHITE, CYAN, BLACK, "-", 3);
+//    on_btn.initButton(&tft,  60, 200, 100, 40, WHITE, CYAN, BLACK,  "+", 3);
+//    off_btn.initButton(&tft, 180, 200, 100, 40, WHITE, CYAN, BLACK, "-", 3);
+    on_btn.initButton(&tft,  200, 100, 50, 50, WHITE, CYAN, BLACK,  "+", 3);
+    off_btn.initButton(&tft, 200, 140, 50, 50, WHITE, CYAN, BLACK, "-", 3);
     exit_btn.initButton(&tft, 120, 250, 150, 40, WHITE, CYAN, BLACK, "Save", 2);
     on_btn.drawButton(false);
     off_btn.drawButton(false);
@@ -254,7 +267,7 @@ float therm_setup( String HeadMsg , float therm ){
 
    header1(HeadMsg);
 
-  tft.fillRect(40, 80, 160, 80, RED);
+  tft.fillRect(40, 80, 120, 80, RED);
   while (save_therm) {  
     tft.setCursor(50,100);
     tft.setTextSize(3);
@@ -277,13 +290,13 @@ float therm_setup( String HeadMsg , float therm ){
         
     if (on_btn.justPressed()) {
         on_btn.drawButton(true);
-        tft.fillRect(40, 80, 160, 80, RED);
+        tft.fillRect(40, 80, 120, 50, RED);
         //  therm++ ;
         therm = therm +0.50 ;
     }
     if (off_btn.justPressed()) {
           off_btn.drawButton(true);
-          tft.fillRect(40, 80, 160, 80, RED);
+          tft.fillRect(40, 80, 120, 50, RED);
           //therm-- ;
           therm = therm -0.50 ;
     }
@@ -303,7 +316,8 @@ float therm_setup( String HeadMsg , float therm ){
 //--------------------------------------------
 float mode_setup( ){
 //--------------------------------------------
-
+    wdt_disable(); // watchdog
+    
     bool save_therm = true ;
     tft.fillScreen(BLACK);
 
@@ -385,8 +399,8 @@ float mode_setup( ){
 //-------------------------------------------
 void header1( String  Msg   ) {  
 //-------------------------------------------  
-
-     tft.fillRect(20, 10, 200 , 40, RED);
+     if (MODE_DEMO)  Msg+= " MODE_DEMO" ;
+     tft.fillRect(10, 10, 220 , 40, RED);
        
     tft.setTextSize(5);
     tft.setTextColor(WHITE);
@@ -406,6 +420,10 @@ void header1( String  Msg   ) {
 //----------------------------------------
 void dispScreen(){
 //----------------------------------------
+
+  watchdogEnable(); // set up watchdog timer in interrupt-only mode
+
+
 //---------Διαχ/ση Relay Λέβητα ( Pellet ή Oil  )------ 
      tft.setCursor(160,90);
      tft.print(  therm1  );
@@ -535,11 +553,11 @@ void msg_time(int x, int y, String msg, uint32_t t) {
 //-----------------------------------
 void ESP_Reset(){
 //-----------------------------------  
-
-  Serial.print( "ESP_Reset."  );  
-
+Serial.print( "ESP_Reset."  );   
+ digitalWrite(Relay_watchdog,HIGH); 
+ delay(100) ;
+ digitalWrite(Relay_watchdog,LOW);   
 }
-
 
 
 //-----------------------------------
@@ -568,5 +586,58 @@ void bootSreen() {
   
   tft.fillScreen(BLACK);
 }
+//-----------------------------------
+void watchdogEnable() {
+//-----------------------------------
+  counter=0;
+  cli();                              // disable interrupts
+
+  MCUSR = 0;                          // reset status register flags
+
+                                      // Put timer in interrupt-only mode:                                        
+  WDTCSR |= 0b00011000;               // Set WDCE (5th from left) and WDE (4th from left) to enter config mode,
+                                      // using bitwise OR assignment (leaves other bits unchanged).
+  WDTCSR =  0b01000000 | 0b100001;    // set WDIE (interrupt enable...7th from left, on left side of bar)
+                                      // clr WDE (reset enable...4th from left)
+                                      // and set delay interval (right side of bar) to 8 seconds,
+                                      // using bitwise OR operator.
+
+  sei();                              // re-enable interrupts
+  //wdt_reset();                      // this is not needed...timer starts without it
+
+  // delay interval patterns:
+  //  16 ms:     0b000000
+  //  500 ms:    0b000101
+  //  1 second:  0b000110
+  //  2 seconds: 0b000111
+  //  4 seconds: 0b100000
+  //  8 seconds: 0b100001
+
+}
+
+ISR(WDT_vect) // watchdog timer interrupt service routine
+{
+  counter+=1;
+
+  if (counter < countmax)
+  {
+    wdt_reset(); // start timer again (still in interrupt-only mode)
+  }
+  else             // then change timer to reset-only mode with short (16 ms) fuse
+  {
+    
+    MCUSR = 0;                          // reset flags
+
+                                        // Put timer in reset-only mode:
+    WDTCSR |= 0b00011000;               // Enter config mode.
+    WDTCSR =  0b00001000 | 0b000000;    // clr WDIE (interrupt enable...7th from left)
+                                        // set WDE (reset enable...4th from left), and set delay interval
+                                        // reset system in 16 ms...
+                                        // unless wdt_disable() in loop() is reached first
+ 
+    //wdt_reset(); // not needed
+  }
+}
+
 
 //#endif

@@ -213,8 +213,26 @@ void setup(){
     }
     WiFi.SSID().toCharArray(con_ssid, 32);
     WiFi.psk().toCharArray(con_psk, 64);
+  // RemoteXY 2.4.6  
+  //  remotexy = new CRemoteXY (RemoteXY_CONF_PROGMEM, &RemoteXY, REMOTEXY_ACCESS_PASSWORD,  con_ssid , con_psk, REMOTEXY_CLOUD_SERVER, REMOTEXY_CLOUD_PORT, REMOTEXY_CLOUD_TOKEN );
+
+  //---------------  // RemoteXY 3.1.9
+   remotexy = new CRemoteXY (
+    RemoteXY_CONF_PROGMEM,
+    &RemoteXY,
+    "",
+    new CRemoteXYConnectionCloud (
+      new CRemoteXYComm_WiFi (
+        con_ssid,       // REMOTEXY_WIFI_SSID
+        con_psk),          // REMOTEXY_WIFI_PASSWORD
+      "cloud.remotexy.com",   // REMOTEXY_CLOUD_SERVER
+      6376,                   // REMOTEXY_CLOUD_PORT
+      "078a2fb13ad44666194d3dbd124c4332"  // REMOTEXY_CLOUD_TOKEN
+    )
+  );
+  //----------------
+
     
-    remotexy = new CRemoteXY (RemoteXY_CONF_PROGMEM, &RemoteXY, REMOTEXY_ACCESS_PASSWORD,  con_ssid , con_psk, REMOTEXY_CLOUD_SERVER, REMOTEXY_CLOUD_PORT, REMOTEXY_CLOUD_TOKEN );
      //------------end autoConnect-------------- 
     //Serial.print( RemoteXY.connect_flag );   
 }
