@@ -206,7 +206,9 @@ void setup(void)
     tft.begin(ID);
     tft.setRotation(0);            // 0= PORTRAIT  3 = LANDSCAPE
     tft.fillScreen(BLACK);
-u8g2_for_adafruit_gfx.begin(tft); 
+    
+    u8g2_for_adafruit_gfx.begin(tft); 
+
     pinMode(Relay_01,OUTPUT);  // Relay Λέβητα Pellet 
     pinMode(Relay_02,OUTPUT);  // Relay Λέβητα Πετρελαίου
     pinMode(Relay_03,OUTPUT);  // Relay Κυκλοφοριτή
@@ -299,8 +301,8 @@ float therm_setup( String HeadMsg , float therm ){
    u8g2_for_adafruit_gfx.drawUTF8( 60,320, "    Θερμοκρασία    " );
    u8g2_for_adafruit_gfx.drawUTF8( 60,340, "  καί πατήστε Save " );
     
-  tft.fillRect(40, 80, 160, 80, RED);
-  while (save_therm) {  
+   tft.fillRect(40, 80, 160, 80, RED);
+  while (save_therm) {
     tft.setCursor(50,100);
     tft.setTextSize(3);
     tft.setTextColor(WHITE);

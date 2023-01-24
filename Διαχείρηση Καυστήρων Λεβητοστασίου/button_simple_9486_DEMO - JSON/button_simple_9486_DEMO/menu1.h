@@ -4,7 +4,7 @@ bool ESP_Live = false ;
 //--------------------------------------------
 void menu1(){
 //--------------------------------------------
-//#include "bitmap_mono.h"
+ 
  therm1_btn.initButton(&tft,  80, 100, 150, 40, WHITE, RED, BLACK, "", 2);
  therm2_btn.initButton(&tft,  80, 150, 150, 40, WHITE, RED, BLACK, "", 2);
  therm3_btn.initButton(&tft,  80, 200, 150, 40, WHITE, RED, BLACK, "", 2);
@@ -12,21 +12,17 @@ void menu1(){
  therm2_btn.drawButton(false);
  therm3_btn.drawButton(false);
 
-// PreviewMenu_btn.initButton(&tft,  40, 400, 50, 40, WHITE, CYAN, BLACK, "<", 3);
-// NextMenu_btn.initButton(&tft,    120, 400, 50, 40, WHITE, CYAN, BLACK, ">", 3);
-// mode_btn.initButton(&tft,    250, 400, 100, 50, WHITE, RED, BLACK, "Mode", 2);
-
  PreviewMenu_btn.initButton(&tft,  40, 400, 50, 40, WHITE, CYAN, BLACK, "", 3);
  NextMenu_btn.initButton(&tft,    120, 400, 50, 40, WHITE, CYAN, BLACK, "", 3);
- mode_btn.initButton(&tft,    250, 400, 100, 50, WHITE, BLUE, WHITE, "Mode", 2);
+ mode_btn.initButton(&tft,    250, 400, 100, 50, WHITE, BLUE, WHITE, "Setup", 2);
  
  PreviewMenu_btn.drawButton(false);
  NextMenu_btn.drawButton(false);
  mode_btn.drawButton(false);
  
-     u8g2_for_adafruit_gfx.setFontMode(1); 
-     u8g2_for_adafruit_gfx.setForegroundColor(WHITE);
-     u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek); 
+ u8g2_for_adafruit_gfx.setFontMode(1); 
+ u8g2_for_adafruit_gfx.setForegroundColor(WHITE);
+ u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_greek); 
 
  bool While_menu = true ;
  dispMenu = true ;
@@ -68,14 +64,13 @@ void menu1(){
        }
   
        header1( "Επιλογή->"+ Shead );
-  
        therm1_btn.drawButton();   
        therm2_btn.drawButton();   
        therm3_btn.drawButton(); 
-	   PreviewMenu_btn.drawButton();
+       PreviewMenu_btn.drawButton();
        NextMenu_btn.drawButton();
-       mode_btn.drawButton();
-
+       mode_btn.drawButton();     
+  
        u8g2_for_adafruit_gfx.setCursor(20,100);                // start writing at this position
        u8g2_for_adafruit_gfx.print( "Λέβητας");  
        u8g2_for_adafruit_gfx.setCursor(20,150);                // start writing at this position
@@ -240,17 +235,17 @@ void menu1(){
              dispScreen() ; 
            }
   
-         //---------------------------------------------
+     //---------------------------------------------
   
     if (therm1_btn.justPressed()) {
         therm1_btn.drawButton(true);
         therm1 =   therm_setup( "Λέβητας" , therm1   ) ;
-        EEPROM.put( 10,therm1);
+        EEPROM.put( 10,therm1);;
     }
     if (therm2_btn.justPressed()) {
         therm2_btn.drawButton(true);
         therm2 =   therm_setup( "Κυκλοφοριτής" , therm2   ) ;
-        EEPROM.put( 20,therm2);
+        EEPROM.put( 20,therm2);;
     }
     if (therm3_btn.justPressed()) {
         therm3_btn.drawButton(true);
