@@ -68,8 +68,7 @@ struct {
 
 #include <ESP_Mail_Client.h>
 
-//#define con_ssid "VODAFONE_0112"
-//#define con_psk "hu2tar4f5542smcc"
+
 
 /** For Gmail, the app password will be used for log in
  *  Check out https://github.com/mobizt/ESP-Mail-Client#gmail-smtp-and-imap-required-app-passwords-to-sign-in
@@ -92,8 +91,8 @@ struct {
 #define SMTP_PORT esp_mail_smtp_port_25 // port 465 is not available for Outlook.com
 
 /* The log in credentials */
-#define AUTHOR_EMAIL "myriskos@yahoo.gr"
-#define AUTHOR_PASSWORD "zylnocgpmjiqtdzg"
+#define AUTHOR_EMAIL "myrxxxxxx@yahoo.gr"
+#define AUTHOR_PASSWORD "xxxxxxxxxxxxxx"
 
 /* Declare the global used SMTPSession object for SMTP transport */
 SMTPSession smtp;
@@ -181,7 +180,7 @@ void StartRemoteXY(){
   remotexy->addConnection (new CRemoteXYConnectionCloud ( wifi, 
     "cloud.remotexy.com",                     // REMOTEXY_CLOUD_SERVER 
     6376,                                     // REMOTEXY_CLOUD_PORT
-    "fe907fb1cef195e8720675bdee8c869e"                // REMOTEXY_CLOUD_TOKEN
+    "xxxxxxxxxxxxxxxxxxxxxxx"                // REMOTEXY_CLOUD_TOKEN
   ));
 }
 
@@ -247,7 +246,7 @@ void SendMail( String textMsg  ){
   message.sender.name = F("ESP Mail"); // This witll be used with 'MAIL FROM' command and 'From' header field.
   message.sender.email = AUTHOR_EMAIL; // This witll be used with 'From' header field.
   message.subject = F("ESP8266 sending plain text Email");
-  message.addRecipient(F("Afoi Droumplh OE "), F("info@dbsoft.gr")); // This will be used with RCPT TO command and 'To' header field.
+  message.addRecipient(F("Afoi Droumplh OE "), F("info@dbxxxx.gr")); // This will be used with RCPT TO command and 'To' header field.
 
   //String textMsg = " Αυτό ειναι ενα Δοκιμαστικο Mail απο το ESP8266";
   message.text.content = textMsg;
@@ -295,7 +294,7 @@ void SendMail( String textMsg  ){
    */
   message.priority = esp_mail_smtp_priority::esp_mail_smtp_priority_high;
 
-  // message.response.reply_to = "myriskosarduino@gmail.com ";
+  // message.response.reply_to = "myriskosjohnarduino@gmail.com ";
   // message.response.return_path = "someone@somemail.com";
 
   /** The Delivery Status Notifications e.g.
@@ -308,7 +307,7 @@ void SendMail( String textMsg  ){
   // message.response.notify = esp_mail_smtp_notify_success | esp_mail_smtp_notify_failure | esp_mail_smtp_notify_delay;
 
   /* Set the custom message header */
-  message.addHeader(F("Message-ID: <info.dbsoft@gmail.com>"));
+  message.addHeader(F("Message-ID: <info.xxxxx@gmail.com>"));
 
   // For Root CA certificate verification (ESP8266 and ESP32 only)
   // session.certificate.cert_data = rootCACert;
